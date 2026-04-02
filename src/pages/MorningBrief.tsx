@@ -8,6 +8,9 @@ const C = {
 
 export const MorningBrief = () => {
   const now = new Date();
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning'
+    : hour < 17 ? 'Good afternoon' : 'Good evening';
   const dateStr = now.toLocaleDateString('en-US', {
     weekday: 'long', month: 'long', day: 'numeric'
   });
@@ -60,11 +63,11 @@ export const MorningBrief = () => {
         padding: '22px 28px', marginBottom: 20,
       }}>
         <div style={{ fontSize: 22, fontWeight: 700, color: '#fff', marginBottom: 4 }}>
-          Hello, Deepika.
+          {greeting}, Zubia.
         </div>
         <div style={{ fontSize: 13, color: C.mint, marginBottom: 8 }}>{dateStr}</div>
         <div style={{ fontSize: 12, color: 'rgba(200,232,229,0.95)', marginBottom: 6 }}>
-          Welcome back to Pulse Business Admin. Here is your practice at a glance.
+          Here is what needs your attention today.
         </div>
         <div style={{ fontSize: 12, color: 'rgba(200,232,229,0.8)' }}>
           {overdueInvoices.length > 0
