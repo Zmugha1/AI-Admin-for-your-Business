@@ -171,12 +171,44 @@ export const invoices: Invoice[] = [
     issueDate: '2026-03-15',
     dueDate: '2026-03-30',
     amount: 1499,
-    status: 'overdue',
+    status: 'paid',
     lineItems: [
       { id: 'li4', description: 'The Spark — Decision Intelligence Audit',
         quantity: 1, rate: 1499, amount: 1499 }
     ],
     notes: 'Spark audit — awaiting payment.'
+  },
+  {
+    id: 'inv5',
+    clientId: 'c5',
+    clientName: 'Dr. Marcus Webb',
+    invoiceNumber: 'INV-2026-005',
+    issueDate: '2026-03-01',
+    dueDate: '2026-03-15',
+    amount: 1499,
+    status: 'paid',
+    lineItems: [
+      { id: 'li5',
+        description: 'The Spark — Decision Intelligence Audit',
+        quantity: 1, rate: 1499, amount: 1499 }
+    ],
+    notes: 'Spark audit complete. Proposal sent.',
+  },
+  {
+    id: 'inv6',
+    clientId: 'c7',
+    clientName: 'James Okonkwo',
+    invoiceNumber: 'INV-2026-006',
+    issueDate: '2026-04-01',
+    dueDate: '2026-04-15',
+    amount: 1499,
+    status: 'sent',
+    lineItems: [
+      { id: 'li6',
+        description: 'The Spark — Decision Intelligence Audit',
+        quantity: 1, rate: 1499, amount: 1499 }
+    ],
+    notes: 'Spark audit scheduled for April 8.',
   },
 ];
 
@@ -275,15 +307,15 @@ export const proposals: Proposal[] = [
 
 export const revenueByMonth = [
   { month: 'Jan', actual: 7500 },
-  { month: 'Feb', actual: 11000 },
-  { month: 'Mar', actual: 5547 },
-  { month: 'Apr', actual: 747 },
-  { month: 'May', proj: 2000 },
-  { month: 'Jun', proj: 4500 },
-  { month: 'Jul', proj: 6000 },
-  { month: 'Aug', proj: 8000 },
-  { month: 'Sep', proj: 10000 },
-  { month: 'Oct', proj: 13000 },
-  { month: 'Nov', proj: 16000 },
+  { month: 'Feb', actual: 11199 },
+  { month: 'Mar', actual: 8547 },
+  { month: 'Apr', actual: 4446 },
+  { month: 'May', proj: 6000 },
+  { month: 'Jun', proj: 8500 },
+  { month: 'Jul', proj: 10000 },
+  { month: 'Aug', proj: 12000 },
+  { month: 'Sep', proj: 14000 },
+  { month: 'Oct', proj: 16000 },
+  { month: 'Nov', proj: 18000 },
   { month: 'Dec', proj: 20000 },
 ];
