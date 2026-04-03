@@ -19,7 +19,7 @@ const navItems = [
   { id: 'projects',      label: 'Projects',           icon: FolderOpen },
   { id: 'invoices',      label: 'Invoices',           icon: DollarSign },
   { id: 'documents',     label: 'Documents',          icon: FileText   },
-  { id: 'interventions', label: 'Services',      icon: Zap        },
+  { id: 'interventions', label: 'Services', icon: Zap },
   { id: 'practice',      label: 'My Practice',        icon: BarChart2  },
 ];
 
