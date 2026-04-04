@@ -3,6 +3,7 @@ import { useOllamaStatus } from './hooks/useOllamaStatus';
 import { runMigrations } from './services/migrationService';
 import { ALL_MIGRATIONS } from './services/migrations';
 import { startQueuePoller } from './services/jobQueueService';
+import { MorningBrief } from './modules/MorningBrief';
 import './styles/brand.css';
 
 type Page =
@@ -198,7 +199,7 @@ export default function App() {
           </div>
         )}
 
-        {page === 'morning'  && <Placeholder title="Morning Brief" />}
+        {page === 'morning'  && <MorningBrief />}
         {page === 'pipeline' && <Placeholder title="My Pipeline" />}
         {page === 'content'  && <Placeholder title="Content Queue" />}
         {page === 'run_job'  && <Placeholder title="Run a Job" />}
