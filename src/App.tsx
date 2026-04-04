@@ -1,44 +1,50 @@
-import { useState } from 'react';
-import { Sidebar } from './components/Sidebar';
-import { MorningBrief } from './pages/MorningBrief';
-import { BusinessGoals } from './pages/BusinessGoals';
-import { Clients } from './pages/Clients';
-import { Projects } from './pages/Projects';
-import { Invoices } from './pages/Invoices';
-import { Documents } from './pages/Documents';
-import { Interventions } from './pages/Interventions';
-import { MyPractice } from './pages/MyPractice';
-import { Settings } from './pages/Settings';
+import { useState } from "react";
+import reactLogo from "./assets/react.svg";
+import { invoke } from "@tauri-apps/api/core";
+import "./App.css";
 
 function App() {
-  const [activePage, setActivePage] = useState('morning');
+  const [greetMsg, setGreetMsg] = useState("");
+  const [name, setName] = useState("");
 
-  const renderPage = () => {
-    switch (activePage) {
-      case 'morning':       return <MorningBrief />;
-      case 'goals':         return <BusinessGoals />;
-      case 'clients':       return <Clients />;
-      case 'projects':      return <Projects />;
-      case 'invoices':      return <Invoices />;
-      case 'documents':     return <Documents />;
-      case 'interventions': return <Interventions />;
-      case 'practice':      return <MyPractice />;
-      case 'settings':      return <Settings />;
-      default:              return <MorningBrief />;
-    }
-  };
+  async function greet() {
+    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+    setGreetMsg(await invoke("greet", { name }));
+  }
 
   return (
-    <div style={{ display: 'flex', height: '100vh',
-      overflow: 'hidden', background: '#FEFAF5' }}>
-      <Sidebar activePage={activePage} onPageChange={setActivePage} />
-      <main style={{
-        flex: 1, marginLeft: 220,
-        overflowY: 'auto', height: '100vh',
-      }}>
-        {renderPage()}
-      </main>
-    </div>
+    <main className="container">
+      <h1>Welcome to Tauri + React</h1>
+
+      <div className="row">
+        <a href="https://vite.dev" target="_blank">
+          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
+        </a>
+        <a href="https://tauri.app" target="_blank">
+          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
+        </a>
+        <a href="https://react.dev" target="_blank">
+          <img src={reactLogo} className="logo react" alt="React logo" />
+        </a>
+      </div>
+      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
+
+      <form
+        className="row"
+        onSubmit={(e) => {
+          e.preventDefault();
+          greet();
+        }}
+      >
+        <input
+          id="greet-input"
+          onChange={(e) => setName(e.currentTarget.value)}
+          placeholder="Enter a name..."
+        />
+        <button type="submit">Greet</button>
+      </form>
+      <p>{greetMsg}</p>
+    </main>
   );
 }
 
