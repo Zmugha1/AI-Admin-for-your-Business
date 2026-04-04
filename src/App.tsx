@@ -6,6 +6,7 @@ import { startQueuePoller } from './services/jobQueueService';
 import { MorningBrief } from './modules/MorningBrief';
 import { RunAJob } from './modules/RunAJob';
 import { MyPrompts } from './modules/MyPrompts';
+import { MyIdentity } from './modules/MyIdentity';
 import './styles/brand.css';
 
 type Page =
@@ -207,7 +208,7 @@ export default function App() {
         {page === 'run_job'  && <RunAJob />}
         {page === 'prompts'  && <MyPrompts />}
         {page === 'stz'      && <Placeholder title="My STZ Layers" />}
-        {page === 'identity' && <Placeholder title="My Identity" />}
+        {page === 'identity' && <MyIdentity />}
         {page === 'goals'    && <Placeholder title="Business Goals" />}
         {page === 'vault'    && <Placeholder title="The Vault" />}
         {page === 'audit'    && <Placeholder title="Audit Log" />}
