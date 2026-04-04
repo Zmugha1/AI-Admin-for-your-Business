@@ -1,4 +1,12 @@
-# Getting Started with Create React App
+# Zubia Pulse
+
+Pulse Business Admin: React + TypeScript dashboard. Source repository: [github.com/Zmugha1/Zubia_Pulse](https://github.com/Zmugha1/Zubia_Pulse).
+
+In this monorepo the app folder is `AI-Admin-for-your-Business/pulse-business-admin/` (you can rename it to `Zubia_Pulse` locally to match the repo).
+
+---
+
+## Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
