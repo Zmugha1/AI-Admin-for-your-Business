@@ -5,6 +5,7 @@ import { ALL_MIGRATIONS } from './services/migrations';
 import { startQueuePoller } from './services/jobQueueService';
 import { MorningBrief } from './modules/MorningBrief';
 import { RunAJob } from './modules/RunAJob';
+import { MyPrompts } from './modules/MyPrompts';
 import './styles/brand.css';
 
 type Page =
@@ -204,7 +205,7 @@ export default function App() {
         {page === 'pipeline' && <Placeholder title="My Pipeline" />}
         {page === 'content'  && <Placeholder title="Content Queue" />}
         {page === 'run_job'  && <RunAJob />}
-        {page === 'prompts'  && <Placeholder title="My Prompts" />}
+        {page === 'prompts'  && <MyPrompts />}
         {page === 'stz'      && <Placeholder title="My STZ Layers" />}
         {page === 'identity' && <Placeholder title="My Identity" />}
         {page === 'goals'    && <Placeholder title="Business Goals" />}
