@@ -1,0 +1,56 @@
+:root {
+  --teal:   #3BBFBF;
+  --teal2:  #C8E8E5;
+  --teal3:  #E8F7F7;
+  --coral:  #F05F57;
+  --coral2: #FAD4D2;
+  --navy:   #2D4459;
+  --slate:  #7A8F95;
+  --cream:  #FEFAF6;
+  --gold:   #C8974A;
+  --gold2:  #F5E6CC;
+  --green:  #3A7D5C;
+  --green2: #C8E8D8;
+  --white:  #FFFFFF;
+  --ink:    #1A2633;
+  --lgray:  #F4F7F8;
+  --mgray:  #E0E6E8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4 {
+  font-family: Georgia, 'Times New Roman', serif;
+  color: var(--navy);
+}
+
+.label {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--slate);
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--lgray); }
+::-webkit-scrollbar-thumb {
+  background: var(--teal2);
+  border-radius: 3px;
+}
+
+textarea:focus, input:focus {
+  outline: none;
+  border-color: var(--teal) !important;
+  box-shadow: 0 0 0 3px rgba(59,191,191,0.12);
+}
+
+button:active { transform: scale(0.98); }
