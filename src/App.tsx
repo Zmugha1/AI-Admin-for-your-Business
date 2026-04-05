@@ -8,6 +8,7 @@ import { RunAJob } from './modules/RunAJob';
 import { MyPrompts } from './modules/MyPrompts';
 import { MyIdentity } from './modules/MyIdentity';
 import { STZLayers } from './modules/STZLayers';
+import { TheCapture } from './modules/TheCapture';
 import './styles/brand.css';
 
 type Page =
@@ -216,7 +217,7 @@ export default function App() {
         )}
 
         {page === 'morning'  && <MorningBrief />}
-        {page === 'capture'  && <Placeholder title="The Capture" />}
+        {page === 'capture'  && <TheCapture />}
         {page === 'stz'      && <STZLayers />}
         {page === 'identity' && <MyIdentity />}
         {page === 'pipeline' && <Placeholder title="My Pipeline" />}
