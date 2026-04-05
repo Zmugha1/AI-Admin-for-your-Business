@@ -9,6 +9,7 @@ import { MyPrompts } from './modules/MyPrompts';
 import { MyIdentity } from './modules/MyIdentity';
 import { STZLayers } from './modules/STZLayers';
 import { TheCapture } from './modules/TheCapture';
+import { MyPipeline } from './modules/MyPipeline';
 import './styles/brand.css';
 
 type Page =
@@ -220,7 +221,7 @@ export default function App() {
         {page === 'capture'  && <TheCapture />}
         {page === 'stz'      && <STZLayers />}
         {page === 'identity' && <MyIdentity />}
-        {page === 'pipeline' && <Placeholder title="My Pipeline" />}
+        {page === 'pipeline' && <MyPipeline />}
         {page === 'run_job'  && <RunAJob />}
         {page === 'prompts'  && <MyPrompts />}
         {page === 'content'  && <Placeholder title="Content Queue" />}
