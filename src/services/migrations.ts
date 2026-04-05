@@ -567,4 +567,28 @@ MATERIALS NEEDED:',
       'Full blog post',
       300,500,0,1,datetime('now'));`,
   },
+  {
+    version: 18,
+    name: 'aha_moments',
+    sql: `CREATE TABLE IF NOT EXISTS aha_moments (
+      aha_id TEXT PRIMARY KEY,
+      raw_input TEXT NOT NULL,
+      input_type TEXT DEFAULT 'text',
+      key_insight TEXT,
+      stz_layer INTEGER,
+      domain_area TEXT,
+      source_title TEXT,
+      confirms_or_challenges TEXT,
+      added_to_embeddings INTEGER DEFAULT 0,
+      content_worthy INTEGER DEFAULT 0,
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_aha_layer
+      ON aha_moments(stz_layer);
+    CREATE INDEX IF NOT EXISTS idx_aha_created
+      ON aha_moments(created_at);
+    CREATE INDEX IF NOT EXISTS idx_aha_content
+      ON aha_moments(content_worthy);`,
+  },
 ];
