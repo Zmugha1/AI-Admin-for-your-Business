@@ -10,6 +10,7 @@ import { MyIdentity } from './modules/MyIdentity';
 import { STZLayers } from './modules/STZLayers';
 import { TheCapture } from './modules/TheCapture';
 import { MyPipeline } from './modules/MyPipeline';
+import { BusinessGoals } from './modules/BusinessGoals';
 import './styles/brand.css';
 
 type Page =
@@ -225,7 +226,7 @@ export default function App() {
         {page === 'run_job'  && <RunAJob />}
         {page === 'prompts'  && <MyPrompts />}
         {page === 'content'  && <Placeholder title="Content Queue" />}
-        {page === 'goals'    && <Placeholder title="Business Goals" />}
+        {page === 'goals'    && <BusinessGoals />}
         {page === 'vault'    && <Placeholder title="The Vault" />}
         {page === 'audit'    && <Placeholder title="Audit Log" />}
         {page === 'settings' && <Placeholder title="Settings" />}
