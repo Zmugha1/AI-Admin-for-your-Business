@@ -11,6 +11,7 @@ import { STZLayers } from './modules/STZLayers';
 import { TheCapture } from './modules/TheCapture';
 import { MyPipeline } from './modules/MyPipeline';
 import { BusinessGoals } from './modules/BusinessGoals';
+import { ContentQueue } from './modules/ContentQueue';
 import './styles/brand.css';
 
 type Page =
@@ -225,7 +226,7 @@ export default function App() {
         {page === 'pipeline' && <MyPipeline />}
         {page === 'run_job'  && <RunAJob />}
         {page === 'prompts'  && <MyPrompts />}
-        {page === 'content'  && <Placeholder title="Content Queue" />}
+        {page === 'content'  && <ContentQueue />}
         {page === 'goals'    && <BusinessGoals />}
         {page === 'vault'    && <Placeholder title="The Vault" />}
         {page === 'audit'    && <Placeholder title="Audit Log" />}
