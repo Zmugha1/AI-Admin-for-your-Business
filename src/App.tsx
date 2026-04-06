@@ -12,6 +12,7 @@ import { TheCapture } from './modules/TheCapture';
 import { MyPipeline } from './modules/MyPipeline';
 import { BusinessGoals } from './modules/BusinessGoals';
 import { ContentQueue } from './modules/ContentQueue';
+import { AuditLog } from './modules/AuditLog';
 import './styles/brand.css';
 
 type Page =
@@ -229,7 +230,7 @@ export default function App() {
         {page === 'content'  && <ContentQueue />}
         {page === 'goals'    && <BusinessGoals />}
         {page === 'vault'    && <Placeholder title="The Vault" />}
-        {page === 'audit'    && <Placeholder title="Audit Log" />}
+        {page === 'audit'    && <AuditLog />}
         {page === 'settings' && <Placeholder title="Settings" />}
       </main>
     </div>
