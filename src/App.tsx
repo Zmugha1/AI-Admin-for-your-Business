@@ -11,6 +11,7 @@ import { STZLayers } from './modules/STZLayers';
 import { TheCapture } from './modules/TheCapture';
 import { MyPipeline } from './modules/MyPipeline';
 import { BusinessGoals } from './modules/BusinessGoals';
+import { MyFinances } from './modules/MyFinances';
 import { ContentQueue } from './modules/ContentQueue';
 import { AuditLog } from './modules/AuditLog';
 import './styles/brand.css';
@@ -25,6 +26,7 @@ type Page =
   | 'prompts'
   | 'content'
   | 'goals'
+  | 'finances'
   | 'vault'
   | 'audit'
   | 'settings';
@@ -39,6 +41,7 @@ const NAV: { id: Page; label: string }[] = [
   { id: 'prompts',  label: 'My Prompts'      },
   { id: 'content',  label: 'Content Queue'   },
   { id: 'goals',    label: 'Business Goals'  },
+  { id: 'finances', label: 'My Finances'     },
   { id: 'vault',    label: 'The Vault'       },
   { id: 'audit',    label: 'Audit Log'       },
   { id: 'settings', label: 'Settings'        },
@@ -229,6 +232,7 @@ export default function App() {
         {page === 'prompts'  && <MyPrompts />}
         {page === 'content'  && <ContentQueue />}
         {page === 'goals'    && <BusinessGoals />}
+        {page === 'finances' && <MyFinances />}
         {page === 'vault'    && <Placeholder title="The Vault" />}
         {page === 'audit'    && <AuditLog />}
         {page === 'settings' && <Placeholder title="Settings" />}

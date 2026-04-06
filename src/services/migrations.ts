@@ -641,4 +641,65 @@ Probe: [Follow-up that goes deeper]
 Output the questions only. No preamble. No summary. Questions and probes only.'
     );`,
   },
+  {
+    version: 21,
+    name: 'finances_and_taxes',
+    sql: `CREATE TABLE IF NOT EXISTS tax_quarters (
+      quarter_id TEXT PRIMARY KEY,
+      year INTEGER NOT NULL,
+      quarter TEXT NOT NULL,
+      period_label TEXT NOT NULL,
+      due_date TEXT NOT NULL,
+      income REAL DEFAULT 0,
+      expenses REAL DEFAULT 0,
+      profit REAL DEFAULT 0,
+      reasonable_salary REAL DEFAULT 0,
+      distributions REAL DEFAULT 0,
+      estimated_tax_llc REAL DEFAULT 0,
+      estimated_tax_scorp_federal REAL DEFAULT 0,
+      estimated_tax_scorp_state REAL DEFAULT 0,
+      estimated_tax_total REAL DEFAULT 0,
+      paid INTEGER DEFAULT 0,
+      paid_date TEXT,
+      notes TEXT,
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS expenses (
+      expense_id TEXT PRIMARY KEY,
+      category TEXT NOT NULL,
+      description TEXT NOT NULL,
+      amount REAL NOT NULL,
+      expense_date TEXT NOT NULL,
+      quarter TEXT,
+      year INTEGER,
+      deductible INTEGER DEFAULT 1,
+      payment_method TEXT DEFAULT 'credit_card',
+      notes TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_expenses_category
+      ON expenses(category);
+    CREATE INDEX IF NOT EXISTS idx_expenses_quarter
+      ON expenses(quarter);
+    CREATE INDEX IF NOT EXISTS idx_expenses_year
+      ON expenses(year);
+
+    INSERT OR IGNORE INTO tax_quarters
+      (quarter_id, year, quarter,
+       period_label, due_date)
+    VALUES
+    ('2026-Q1', 2026, 'Q1',
+     'Jan–Mar 2026', '2026-04-15'),
+    ('2026-Q2', 2026, 'Q2',
+     'Apr–Jun 2026', '2026-06-15'),
+    ('2026-Q3', 2026, 'Q3',
+     'Jul–Sep 2026', '2026-09-15'),
+    ('2026-Q4', 2026, 'Q4',
+     'Oct–Dec 2026', '2027-01-15'),
+    ('2027-Q1', 2027, 'Q1',
+     'Jan–Mar 2027', '2027-04-15');`,
+  },
 ];
