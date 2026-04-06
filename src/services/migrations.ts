@@ -592,7 +592,7 @@ MATERIALS NEEDED:',
       ON aha_moments(content_worthy);`,
   },
   {
-    version: 19,
+    version: 20,
     name: 'spark_discovery_job',
     sql: `INSERT OR IGNORE INTO jobs_menu VALUES
     ('spark_discovery','document',
