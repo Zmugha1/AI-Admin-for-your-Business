@@ -121,7 +121,7 @@ export default function App() {
         }}>
           <div style={{
             fontFamily: 'Georgia, serif',
-            fontSize: 15, fontWeight: 700,
+            fontSize: 17, fontWeight: 700,
             color: 'var(--teal)', marginBottom: 2,
           }}>
             Dr. Zubia's Pulse
@@ -177,7 +177,7 @@ export default function App() {
                   color: active
                     ? 'var(--teal2)'
                     : 'var(--slate)',
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: active ? 600 : 400,
                   cursor: 'pointer',
                   textAlign: 'left',
@@ -195,7 +195,7 @@ export default function App() {
           padding: '10px 16px',
           borderTop:
             '1px solid rgba(200,232,229,0.10)',
-          fontSize: 10, color: 'var(--slate)',
+          fontSize: 12, color: 'var(--slate)',
           fontFamily: 'Courier New, monospace',
         }}>
           airgapped · local only
