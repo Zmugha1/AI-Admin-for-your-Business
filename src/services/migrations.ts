@@ -719,4 +719,281 @@ Output the questions only. No preamble. No summary. Questions and probes only.'
     INSERT OR IGNORE INTO google_auth (id)
       VALUES ('zubia');`,
   },
+  {
+    version: 22,
+    name: 'pipeline_stage',
+    sql: `ALTER TABLE contacts
+      ADD COLUMN pipeline_stage TEXT
+      DEFAULT 'prospect';
+    ALTER TABLE contacts
+      ADD COLUMN tier TEXT
+      DEFAULT 'pulse';
+    ALTER TABLE contacts
+      ADD COLUMN mrr REAL DEFAULT 0;
+    ALTER TABLE contacts
+      ADD COLUMN proposal_sent_date TEXT;
+    ALTER TABLE contacts
+      ADD COLUMN contract_signed_date TEXT;
+    ALTER TABLE contacts
+      ADD COLUMN build_start_date TEXT;
+    ALTER TABLE contacts
+      ADD COLUMN go_live_date TEXT;
+    ALTER TABLE contacts
+      ADD COLUMN health_score TEXT
+        DEFAULT 'green';
+    ALTER TABLE contacts
+      ADD COLUMN days_in_stage INTEGER
+        DEFAULT 0;
+    UPDATE contacts
+      SET pipeline_stage = 'active_client'
+      WHERE status = 'active';`,
+  },
+
+  {
+    version: 23,
+    name: 'client_meetings',
+    sql: `CREATE TABLE IF NOT EXISTS
+      client_meetings (
+        meeting_id TEXT PRIMARY KEY,
+        contact_id TEXT NOT NULL,
+        meeting_date TEXT,
+        meeting_type TEXT DEFAULT 'spark',
+        outcome TEXT,
+        transcript_text TEXT,
+        summary_generated INTEGER DEFAULT 0,
+        summary_text TEXT,
+        pain_points_extracted INTEGER DEFAULT 0,
+        pain_points_text TEXT,
+        followup_sent INTEGER DEFAULT 0,
+        followup_text TEXT,
+        prep_completed INTEGER DEFAULT 0,
+        prep_text TEXT,
+        notes TEXT,
+        created_at TEXT DEFAULT (datetime('now')),
+        updated_at TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (contact_id)
+          REFERENCES contacts(contact_id)
+      );
+    CREATE INDEX IF NOT EXISTS
+      idx_client_meetings_contact
+      ON client_meetings(contact_id);
+    CREATE INDEX IF NOT EXISTS
+      idx_client_meetings_date
+      ON client_meetings(meeting_date);`,
+  },
+
+  {
+    version: 24,
+    name: 'client_documents',
+    sql: `CREATE TABLE IF NOT EXISTS
+      client_documents (
+        document_id TEXT PRIMARY KEY,
+        contact_id TEXT NOT NULL,
+        document_type TEXT NOT NULL,
+        title TEXT,
+        content TEXT,
+        status TEXT DEFAULT 'draft',
+        version INTEGER DEFAULT 1,
+        sent_date TEXT,
+        signed_date TEXT,
+        value REAL DEFAULT 0,
+        notes TEXT,
+        created_at TEXT DEFAULT (datetime('now')),
+        updated_at TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (contact_id)
+          REFERENCES contacts(contact_id)
+      );
+    CREATE INDEX IF NOT EXISTS
+      idx_client_docs_contact
+      ON client_documents(contact_id);
+    CREATE INDEX IF NOT EXISTS
+      idx_client_docs_type
+      ON client_documents(document_type);`,
+  },
+
+  {
+    version: 25,
+    name: 'client_reminders',
+    sql: `CREATE TABLE IF NOT EXISTS
+      client_reminders (
+        reminder_id TEXT PRIMARY KEY,
+        contact_id TEXT,
+        reminder_date TEXT NOT NULL,
+        message TEXT NOT NULL,
+        reminder_type TEXT DEFAULT 'followup',
+        priority TEXT DEFAULT 'normal',
+        recurring INTEGER DEFAULT 0,
+        recurring_days INTEGER DEFAULT 0,
+        completed INTEGER DEFAULT 0,
+        completed_date TEXT,
+        created_at TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (contact_id)
+          REFERENCES contacts(contact_id)
+      );
+    CREATE INDEX IF NOT EXISTS
+      idx_reminders_date
+      ON client_reminders(reminder_date);
+    CREATE INDEX IF NOT EXISTS
+      idx_reminders_contact
+      ON client_reminders(contact_id);`,
+  },
+
+  {
+    version: 26,
+    name: 'testimonials',
+    sql: `CREATE TABLE IF NOT EXISTS
+      testimonials (
+        testimonial_id TEXT PRIMARY KEY,
+        contact_id TEXT NOT NULL,
+        request_sent INTEGER DEFAULT 0,
+        request_sent_date TEXT,
+        request_email_text TEXT,
+        received_date TEXT,
+        testimonial_text TEXT,
+        published INTEGER DEFAULT 0,
+        published_where TEXT,
+        published_date TEXT,
+        rating INTEGER,
+        notes TEXT,
+        created_at TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (contact_id)
+          REFERENCES contacts(contact_id)
+      );`,
+  },
+
+  {
+    version: 27,
+    name: 'client_content',
+    sql: `CREATE TABLE IF NOT EXISTS
+      client_content (
+        content_id TEXT PRIMARY KEY,
+        contact_id TEXT,
+        content_type TEXT NOT NULL,
+        title TEXT,
+        body TEXT,
+        status TEXT DEFAULT 'not_started',
+        published_date TEXT,
+        published_where TEXT,
+        notes TEXT,
+        created_at TEXT DEFAULT (datetime('now')),
+        updated_at TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (contact_id)
+          REFERENCES contacts(contact_id)
+      );
+    CREATE INDEX IF NOT EXISTS
+      idx_client_content_type
+      ON client_content(content_type);
+    CREATE INDEX IF NOT EXISTS
+      idx_client_content_status
+      ON client_content(status);
+
+    INSERT OR IGNORE INTO client_content
+      (content_id, contact_id,
+       content_type, title, status)
+    VALUES
+      ('pc_blog_1', NULL,
+       'blog', 'Blog post due this week',
+       'not_started'),
+      ('pc_linkedin_1', NULL,
+       'linkedin',
+       'LinkedIn post — Monday',
+       'not_started'),
+      ('pc_linkedin_2', NULL,
+       'linkedin',
+       'LinkedIn post — Wednesday',
+       'not_started'),
+      ('pc_bni_1', NULL,
+       'bni_pitch',
+       'BNI weekly pitch',
+       'not_started');`,
+  },
+
+  {
+    version: 28,
+    name: 'paper_progress',
+    sql: `CREATE TABLE IF NOT EXISTS
+      paper_progress (
+        paper_id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        journal TEXT,
+        status TEXT DEFAULT 'in_progress',
+        current_section TEXT,
+        target_submission TEXT,
+        submitted_date TEXT,
+        accepted_date TEXT,
+        published_date TEXT,
+        doi TEXT,
+        notes TEXT,
+        last_updated TEXT
+          DEFAULT (datetime('now')),
+        created_at TEXT
+          DEFAULT (datetime('now'))
+      );
+
+    INSERT OR IGNORE INTO paper_progress
+      (paper_id, title, journal,
+       status, current_section,
+       target_submission)
+    VALUES
+      ('paper_2026',
+       'Theory-Constrained Inductive Bias Using LTSI as a Governance Framework for Small-Data Machine Learning',
+       'Under Review — 2026',
+       'under_review',
+       'Full paper submitted',
+       '2026-06-01');`,
+  },
+
+  {
+    version: 29,
+    name: 'client_financials',
+    sql: `CREATE TABLE IF NOT EXISTS
+      client_financials (
+        financial_id TEXT PRIMARY KEY,
+        contact_id TEXT NOT NULL UNIQUE,
+        pricing_model TEXT
+          DEFAULT 'per_job',
+        retainer_active INTEGER DEFAULT 0,
+        retainer_amount REAL DEFAULT 0,
+        retainer_billing_date TEXT,
+        build_fee REAL DEFAULT 0,
+        build_fee_paid INTEGER DEFAULT 0,
+        build_fee_paid_date TEXT,
+        total_revenue REAL DEFAULT 0,
+        total_invoiced REAL DEFAULT 0,
+        total_outstanding REAL DEFAULT 0,
+        offered_price REAL DEFAULT 0,
+        suggested_price REAL DEFAULT 0,
+        currency TEXT DEFAULT 'USD',
+        notes TEXT,
+        created_at TEXT
+          DEFAULT (datetime('now')),
+        updated_at TEXT
+          DEFAULT (datetime('now')),
+        FOREIGN KEY (contact_id)
+          REFERENCES contacts(contact_id)
+      );
+
+    CREATE TABLE IF NOT EXISTS
+      client_jobs_pricing (
+        pricing_id TEXT PRIMARY KEY,
+        contact_id TEXT NOT NULL,
+        job_id TEXT NOT NULL,
+        job_name TEXT NOT NULL,
+        suggested_price REAL DEFAULT 0,
+        offered_price REAL DEFAULT 0,
+        included INTEGER DEFAULT 1,
+        notes TEXT,
+        created_at TEXT
+          DEFAULT (datetime('now')),
+        FOREIGN KEY (contact_id)
+          REFERENCES contacts(contact_id)
+      );
+
+    CREATE INDEX IF NOT EXISTS
+      idx_financials_contact
+      ON client_financials(contact_id);
+    CREATE INDEX IF NOT EXISTS
+      idx_jobs_pricing_contact
+      ON client_jobs_pricing(contact_id);`,
+  },
 ];
