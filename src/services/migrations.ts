@@ -592,7 +592,7 @@ MATERIALS NEEDED:',
       ON aha_moments(content_worthy);`,
   },
   {
-    version: 20,
+    version: 19,
     name: 'spark_discovery_job',
     sql: `INSERT OR IGNORE INTO jobs_menu VALUES
     ('spark_discovery','document',
@@ -642,7 +642,7 @@ Output the questions only. No preamble. No summary. Questions and probes only.'
     );`,
   },
   {
-    version: 21,
+    version: 20,
     name: 'finances_and_taxes',
     sql: `CREATE TABLE IF NOT EXISTS tax_quarters (
       quarter_id TEXT PRIMARY KEY,
@@ -703,7 +703,7 @@ Output the questions only. No preamble. No summary. Questions and probes only.'
      'Jan–Mar 2027', '2027-04-15');`,
   },
   {
-    version: 23,
+    version: 21,
     name: 'google_auth',
     sql: `CREATE TABLE IF NOT EXISTS google_auth (
       id TEXT PRIMARY KEY DEFAULT 'zubia',
