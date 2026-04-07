@@ -702,4 +702,21 @@ Output the questions only. No preamble. No summary. Questions and probes only.'
     ('2027-Q1', 2027, 'Q1',
      'Jan–Mar 2027', '2027-04-15');`,
   },
+  {
+    version: 22,
+    name: 'google_auth',
+    sql: `CREATE TABLE IF NOT EXISTS google_auth (
+      id TEXT PRIMARY KEY DEFAULT 'zubia',
+      access_token TEXT,
+      refresh_token TEXT,
+      token_expiry TEXT,
+      scope TEXT,
+      connected INTEGER DEFAULT 0,
+      last_sync TEXT,
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
+    INSERT OR IGNORE INTO google_auth (id)
+      VALUES ('zubia');`,
+  },
 ];

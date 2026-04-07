@@ -12,6 +12,7 @@ import { TheCapture } from './modules/TheCapture';
 import { MyPipeline } from './modules/MyPipeline';
 import { BusinessGoals } from './modules/BusinessGoals';
 import { MyFinances } from './modules/MyFinances';
+import { GoogleIntegration } from './modules/GoogleIntegration';
 import { ContentQueue } from './modules/ContentQueue';
 import { AuditLog } from './modules/AuditLog';
 import './styles/brand.css';
@@ -27,6 +28,7 @@ type Page =
   | 'content'
   | 'goals'
   | 'finances'
+  | 'google'
   | 'vault'
   | 'audit'
   | 'settings';
@@ -42,6 +44,7 @@ const NAV: { id: Page; label: string }[] = [
   { id: 'content',  label: 'Content Queue'   },
   { id: 'goals',    label: 'Business Goals'  },
   { id: 'finances', label: 'My Finances'     },
+  { id: 'google',   label: 'Google Integration' },
   { id: 'vault',    label: 'The Vault'       },
   { id: 'audit',    label: 'Audit Log'       },
   { id: 'settings', label: 'Settings'        },
@@ -233,6 +236,7 @@ export default function App() {
         {page === 'content'  && <ContentQueue />}
         {page === 'goals'    && <BusinessGoals />}
         {page === 'finances' && <MyFinances />}
+        {page === 'google'   && <GoogleIntegration />}
         {page === 'vault'    && <Placeholder title="The Vault" />}
         {page === 'audit'    && <AuditLog />}
         {page === 'settings' && <Placeholder title="Settings" />}
