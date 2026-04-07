@@ -188,6 +188,13 @@ export async function syncGmail(): Promise<number> {
     [uuidv4(), `${inserted} new emails`]
   );
 
+  await db.execute(
+    `UPDATE google_auth
+     SET last_sync = datetime('now'),
+         updated_at = datetime('now')
+     WHERE id = 'zubia'`
+  );
+
   return inserted;
 }
 
@@ -277,6 +284,13 @@ export async function syncCalendar(): Promise<number> {
      VALUES (?, 'calendar_synced',
              'google_auth', 'zubia', ?)`,
     [uuidv4(), `${inserted} new events`]
+  );
+
+  await db.execute(
+    `UPDATE google_auth
+     SET last_sync = datetime('now'),
+         updated_at = datetime('now')
+     WHERE id = 'zubia'`
   );
 
   return inserted;
