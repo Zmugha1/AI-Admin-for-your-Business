@@ -15,6 +15,7 @@ import { MyFinances } from './modules/MyFinances';
 import { GoogleIntegration } from './modules/GoogleIntegration';
 import { ContentQueue } from './modules/ContentQueue';
 import { AuditLog } from './modules/AuditLog';
+import { DrRajDemo } from './modules/DrRajDemo';
 import './styles/brand.css';
 
 type Page =
@@ -31,6 +32,7 @@ type Page =
   | 'google'
   | 'vault'
   | 'audit'
+  | 'raj_demo'
   | 'settings';
 
 const NAV: { id: Page; label: string }[] = [
@@ -47,6 +49,7 @@ const NAV: { id: Page; label: string }[] = [
   { id: 'google',   label: 'Google Integration' },
   { id: 'vault',    label: 'The Vault'       },
   { id: 'audit',    label: 'Audit Log'       },
+  { id: 'raj_demo', label: 'Dr. Raj Demo'    },
   { id: 'settings', label: 'Settings'        },
 ];
 
@@ -239,6 +242,7 @@ export default function App() {
         {page === 'google'   && <GoogleIntegration />}
         {page === 'vault'    && <Placeholder title="The Vault" />}
         {page === 'audit'    && <AuditLog />}
+        {page === 'raj_demo' && <DrRajDemo />}
         {page === 'settings' && <Placeholder title="Settings" />}
       </main>
     </div>
