@@ -703,7 +703,7 @@ Output the questions only. No preamble. No summary. Questions and probes only.'
      'Jan–Mar 2027', '2027-04-15');`,
   },
   {
-    version: 22,
+    version: 23,
     name: 'google_auth',
     sql: `CREATE TABLE IF NOT EXISTS google_auth (
       id TEXT PRIMARY KEY DEFAULT 'zubia',
