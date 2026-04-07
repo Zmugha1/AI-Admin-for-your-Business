@@ -90,15 +90,41 @@ export function GoogleIntegration() {
 
   async function handleConnect() {
     setConnecting(true);
+    setSyncStatus(
+      'Opening browser. Sign in with Google. ' +
+      'The app will connect automatically.'
+    );
     try {
+      const listenPromise = invoke<string>('google_auth_listen');
       await invoke('google_auth_start');
-      setShowCodeInput(true);
-      setSyncStatus(
-        'Browser opened. Sign in with Google ' +
-        'then paste the authorization code below.'
+      const code = await listenPromise;
+
+      const token = await invoke<{
+        access_token: string;
+        refresh_token: string | null;
+        expires_in: number | null;
+      }>('google_auth_exchange', {
+        code,
+      });
+
+      await saveTokens(
+        token.access_token,
+        token.refresh_token,
+        token.expires_in,
       );
+
+      setShowCodeInput(false);
+      setAuthCode('');
+      setSyncStatus(
+        'Connected successfully. Click Sync Now.'
+      );
+      await load();
     } catch (err) {
-      setSyncStatus(`Error: ${String(err)}`);
+      setSyncStatus(
+        `Connection failed: ${String(err)}. ` +
+        'Try manual code entry below.'
+      );
+      setShowCodeInput(true);
     } finally {
       setConnecting(false);
     }

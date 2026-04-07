@@ -163,3 +163,50 @@ pub async fn google_revoke_token(access_token: String) -> Result<bool, String> {
 
     Ok(response.status().is_success())
 }
+
+#[tauri::command]
+pub async fn google_auth_listen() -> Result<String, String> {
+    tokio::task::spawn_blocking(|| {
+        let server = tiny_http::Server::http("127.0.0.1:8765").map_err(|e| {
+            format!("Cannot start callback server: {}", e)
+        })?;
+
+        let request = server
+            .recv_timeout(std::time::Duration::from_secs(120))
+            .map_err(|e| e.to_string())?
+            .ok_or_else(|| {
+                "OAuth timeout — no response received within 120 seconds".to_string()
+            })?;
+
+        let url = request.url().to_string();
+
+        let content_type = tiny_http::Header::from_bytes(&b"Content-Type"[..], &b"text/html"[..])
+            .map_err(|_| "Invalid Content-Type header".to_string())?;
+
+        let response = tiny_http::Response::from_string(
+            "<html><body><h2>Zubia Pulse connected.\
+             You can close this tab.</h2></body></html>",
+        )
+        .with_header(content_type);
+
+        let _ = request.respond(response);
+
+        let code = url
+            .split('?')
+            .nth(1)
+            .unwrap_or("")
+            .split('&')
+            .find(|p| p.starts_with("code="))
+            .and_then(|p| p.split('=').nth(1))
+            .map(|c| {
+                urlencoding::decode(c)
+                    .unwrap_or_default()
+                    .to_string()
+            })
+            .ok_or_else(|| "No authorization code in callback".to_string())?;
+
+        Ok::<String, String>(code)
+    })
+    .await
+    .map_err(|e| format!("Callback server task failed: {}", e))?
+}

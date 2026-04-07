@@ -35,4 +35,5 @@ base64 = "0.22"
 rand = "0.8"
 sha2 = "0.10"
 urlencoding = "2"
+tiny_http = "0.12"
 
