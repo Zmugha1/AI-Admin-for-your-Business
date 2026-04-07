@@ -66,6 +66,7 @@ pub async fn google_auth_start() -> Result<String, String> {
         .map(|_| format!("{:02x}", rand::random::<u8>()))
         .collect();
 
+    // access_type=offline + prompt=consent: Google returns a refresh_token on first consent.
     let auth_url = format!(
         "https://accounts.google.com/o/oauth2/v2/auth\
         ?client_id={}\
