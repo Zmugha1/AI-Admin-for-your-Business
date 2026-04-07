@@ -1,0 +1,168 @@
+# Dr. Zubia Mughal — Zubia Pulse Desktop
+# Cursor Rules — STZ Governed Build
+# Dr. Data Decision Intelligence LLC
+# Every prompt follows these rules. No exceptions.
+
+## IDENTITY
+
+Builder: Dr. Zubia Mughal, Ed.D.
+Company: Dr. Data Decision Intelligence LLC
+Methodology: Skill Threshold Zone (STZ) Framework
+App: Zubia Pulse Desktop — private airgapped
+  decision intelligence dashboard
+Repo: github.com/Zmugha1/Zubia_Pulse
+Branch: dev only — never main
+
+## TECH STACK — NEVER DEVIATE
+
+- Tauri v2 — NEVER Electron
+- React 19 + TypeScript — always
+- Vite 5 — always
+- Tailwind CSS v3 pinned — NEVER upgrade to v4
+- shadcn/ui for components
+- SQLite via tauri-plugin-sql — NEVER better-sqlite3
+- Ollama via invoke('ollama_generate') —
+  NEVER direct fetch() to localhost:11434
+- No OpenAI API anywhere
+- No Anthropic API anywhere
+- No cloud database — no Supabase — no hosted DB
+- No Electron — no Next.js — no server-side code
+- UUID for all IDs — TEXT type — NEVER integers
+- Database: zubia_pulse.db via getDb()
+- App identifier: com.zubiapulse.desktop
+
+## ARCHITECTURE RULES
+
+- Business logic in services/ only
+  NEVER in modules/ or components/
+- All Ollama calls from TypeScript use invoke()
+  NEVER fetch() — blocked by Tauri CSP
+- All jobs go through job_queue table
+  NEVER fire-and-forget
+- Every action logs to audit_log
+  Governance is non-negotiable
+- Config in configs/ only — NEVER hardcoded
+- Prompts in prompts table — NEVER hardcoded
+  in TypeScript
+- contact_id is TEXT/UUID — NEVER a number
+- NEVER delete contacts — inactivate only
+  via status = 'inactive'
+- NEVER touch existing migrations
+  New migrations get the next version number
+  Always check schema_migrations before running
+- NEVER call fetch() to localhost:11434
+  Always use invoke('ollama_generate')
+- Ollama model: qwen2.5:7b-instruct-q4_k_m
+  num_ctx: 4096, num_predict: 1024,
+  temperature: 0.1, timeout: 120s
+
+## STZ BUILD METHODOLOGY
+
+Every client build follows five layers:
+L1 Prompts — encode how the expert thinks
+L2 Skills — break expertise into named steps
+L3 Agents — sequence skills into workflows
+L4 Contracts — define human vs AI boundaries
+L5 Evaluation — measure and improve over time
+
+Never build without L1 answers in place.
+Never ship without audit trail enabled.
+Never send output without human approval gate.
+Always surface model intelligence for review.
+Never merge AI suggestions silently.
+
+## BRAND COLORS — ALWAYS USE THESE
+
+Navy:   #2D4459  sidebar, headings, dark elements
+Teal:   #3BBFBF  primary action, active states
+Mint:   #C8E8E5  borders, backgrounds, badges
+Coral:  #F05F57  critical alerts, danger
+Gold:   #C8974A  warnings, attention needed
+Slate:  #7A8F95  muted text, labels, inactive
+Cream:  #FEFAF6  page backgrounds
+Green:  #3A7D5C  success, confirmed, paid
+White:  #FFFFFF  cards, panels
+LGray:  #F4F7F8  subtle backgrounds
+MGray:  #E0E6E8  borders, dividers
+
+CSS variables defined in src/styles/brand.css
+Always use var(--teal) not #3BBFBF in components
+
+## TYPOGRAPHY
+
+Headings: Georgia, Times New Roman, serif
+Body: Trebuchet MS, Segoe UI, sans-serif
+Labels and metadata: Courier New, monospace
+Base font size: 16px
+Line height: 1.6
+
+## WRITING RULES — ALL AI OUTPUT
+
+- NO em dashes ever — use commas or periods
+- NO generic AI language
+- Every acronym explained on first use
+- Every new idea needs a cited source
+- Output must sound like Dr. Zubia wrote it
+- Sounding like AI is the primary failure mode
+- Glass box always — every output is traceable
+- No black box outputs — no unsourced claims
+
+## PROMPT DISCIPLINE
+
+One fix per prompt.
+One file per prompt.
+Explicit exclusion list on every prompt.
+Always end with: npx tsc --noEmit
+Always git add specific files only.
+NEVER git add .
+Always push to dev branch only.
+Always report commit hash only — nothing else.
+Stop any agent that touches workflow files.
+
+## QUALITY GATES
+
+Before any output goes to a client:
+- A output: auditable, traceable, baseline delta
+- B output: transparent, correctable, improvable
+- C output: black box — never ships
+- Human review required on everything
+- No output leaves system without approval
+
+## GOVERNANCE
+
+Every recommendation logged to audit_log.
+Every correction logged to exceptions table.
+Every prompt change versioned in prompts table.
+Nothing is a black box.
+Audit trail is non-negotiable.
+HIPAA compliance for healthcare clients.
+EU AI Act compliance for high-risk verticals.
+Data never leaves the machine.
+PII never in any output sent externally.
+Cross-client data isolation enforced always.
+
+## TAURI CAPABILITIES
+
+SQL plugin: sql:default, sql:allow-load,
+  sql:allow-execute, sql:allow-select
+FS plugin: fs:default, fs:allow-read-text-file
+Dialog plugin: dialog:default, dialog:allow-open
+Never touch src-tauri/capabilities/default.json
+  without explicit instruction
+
+## WHAT NEVER TO DO
+
+- NEVER use em dashes in any output
+- NEVER call fetch() to localhost:11434
+- NEVER use better-sqlite3
+- NEVER upgrade Tailwind to v4
+- NEVER use Electron
+- NEVER use integer IDs
+- NEVER hardcode prompts in TypeScript
+- NEVER git add . — always specific files
+- NEVER push to main branch
+- NEVER delete contacts or clients
+- NEVER touch existing migrations
+- NEVER send output without human approval
+- NEVER store PII in cloud systems
+- NEVER use OpenAI or Anthropic API in products
