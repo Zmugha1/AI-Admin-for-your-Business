@@ -79,7 +79,7 @@ export async function getValidToken(): Promise<string | null> {
             access_token: string;
             expires_in: number | null;
           }>('google_refresh_token', {
-            refresh_token: state.refresh_token,
+            refreshToken: state.refresh_token,
           });
           await saveTokens(
             newToken.access_token,
@@ -122,8 +122,8 @@ export async function syncGmail(): Promise<number> {
       received_at: string;
     }[]
   >('gmail_sync', {
-    access_token: token,
-    contact_emails: emails,
+    accessToken: token,
+    contactEmails: emails,
   });
 
   let inserted = 0;
@@ -207,8 +207,8 @@ export async function syncCalendar(): Promise<number> {
       google_event_id: string;
     }[]
   >('calendar_sync', {
-    access_token: token,
-    days_ahead: 7,
+    accessToken: token,
+    daysAhead: 7,
   });
 
   let inserted = 0;
@@ -289,7 +289,7 @@ export async function disconnectGoogle(): Promise<void> {
   if (state.access_token) {
     try {
       await invoke('google_revoke_token', {
-        access_token: state.access_token,
+        accessToken: state.access_token,
       });
     } catch {
       /* ignore */
