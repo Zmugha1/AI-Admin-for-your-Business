@@ -722,6 +722,8 @@ Output the questions only. No preamble. No summary. Questions and probes only.'
   {
     version: 22,
     name: 'pipeline_stage',
+    /* Contacts columns from migrations 1–21 are defined only in v6 (contacts).
+       Do not ADD next_action here; it already exists on contacts. */
     sql: `ALTER TABLE contacts
       ADD COLUMN pipeline_stage TEXT
       DEFAULT 'prospect';
