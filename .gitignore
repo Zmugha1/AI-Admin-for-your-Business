@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# OAuth / API secrets (never commit)
+google_credentials.json
+reference/Client_ID_reference.png
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
