@@ -1,6 +1,7 @@
 import { useState, useEffect, type CSSProperties } from 'react';
 import { getDb } from '../services/db';
 import { v4 as uuidv4 } from 'uuid';
+import { ClientCard } from './ClientCard';
 
 interface Contact {
   contact_id: string;
@@ -97,6 +98,8 @@ export function MyPipeline() {
   const [editMode, setEditMode] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [selectedContactId, setSelectedContactId] =
+    useState<string | null>(null);
 
   useEffect(() => { load(); }, []);
 
@@ -423,6 +426,7 @@ export function MyPipeline() {
               onClick={() => {
                 setSelected(c);
                 setEditMode(false);
+                setSelectedContactId(c.contact_id);
               }}
               style={{
                 padding: '11px 16px',
@@ -1049,6 +1053,38 @@ export function MyPipeline() {
           </div>
         )}
       </div>
+
+      {selectedContactId && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0,
+          right: 0, bottom: 0,
+          background: 'rgba(45,68,89,0.55)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'center',
+          overflowY: 'auto',
+          padding: '24px',
+        }}>
+          <div style={{
+            background: '#FEFAF5',
+            borderRadius: 16,
+            width: '100%',
+            maxWidth: 900,
+            minHeight: '80vh',
+            position: 'relative',
+            boxShadow:
+              '0 20px 60px rgba(0,0,0,0.18)',
+          }}>
+            <ClientCard
+              contactId={selectedContactId}
+              onClose={() =>
+                setSelectedContactId(null)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
