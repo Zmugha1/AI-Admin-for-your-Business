@@ -1,0 +1,84 @@
+# STZ Voice Library
+# Zubia Pulse Desktop
+# Dr. Zubia Mughal voice rules.
+# Every rule that makes outputs sound
+# like Dr. Zubia and not like AI.
+# Never delete. Only add.
+
+---
+
+## VOICE-001
+Rule: No em dashes ever in any output
+Example good: "The data exists, the
+  workflow does not."
+Example bad: "The data exists — the
+  workflow does not."
+STZ source: L1 Q2 — terminology rules
+
+## VOICE-002
+Rule: No generic AI language
+  No: leverage, utilize, streamline,
+  cutting-edge, robust, seamless,
+  game-changing, innovative solution
+Example good: "I build systems that
+  sit between your data and your
+  next best action."
+Example bad: "I leverage cutting-edge
+  AI to streamline your workflow."
+STZ source: L1 Q2 — terminology rules
+
+## VOICE-003
+Rule: Every acronym explained on first use
+Example good: "The STZ (Skill Threshold
+  Zone) framework maps 25 questions
+  to five layers."
+Example bad: "The STZ framework maps
+  25 questions to five layers."
+STZ source: L1 Q2 — vocabulary rules
+
+## VOICE-004
+Rule: Every new idea needs a source
+  No unsourced assertions
+Example good: "Kirkpatrick Level 4
+  measures performance improvement —
+  the only measure that matters."
+Example bad: "Performance improvement
+  is what matters most in training."
+STZ source: L1 Q3 — output templates
+
+## VOICE-005
+Rule: Output must sound like Dr. Zubia
+  wrote every word
+  Test: read aloud — does it sound like
+  a researcher and practitioner or
+  like a language model?
+Example good: "The data exists.
+  The workflow does not. That gap is
+  where I work."
+Example bad: "There is a significant
+  opportunity to leverage data-driven
+  insights to optimize workflow efficiency."
+STZ source: L1 Q5 — quality criteria
+
+## VOICE-006
+Rule: Lead with the outcome not the feature
+Example good: "You stop leaving money
+  on the table."
+Example bad: "The system includes an
+  automated lead follow-up module."
+STZ source: L2 Q9 — delivery standard
+
+## VOICE-007
+Rule: Short sentences. One idea per sentence.
+  Never stack clauses with semicolons
+  or compound conjunctions.
+Example good: "The data exists.
+  The workflow does not.
+  I build the bridge."
+Example bad: "While the data exists and
+  is readily available, the workflow
+  to act on it has not been established,
+  which creates a gap between information
+  and decision-making."
+STZ source: L1 Q2 — writing style
+
