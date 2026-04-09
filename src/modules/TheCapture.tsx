@@ -399,6 +399,7 @@ L5 Evaluation — quality, correction, improvement, measurement`;
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 6, flexShrink: 0,
+                  alignItems: 'flex-end',
                 }}>
                   <span style={{
                     fontSize: 9,
@@ -409,24 +410,70 @@ L5 Evaluation — quality, correction, improvement, measurement`;
                   }}>
                     {aha.created_at.slice(0, 10)}
                   </span>
-                  {aha.content_worthy === 1 && (
+                  <div style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 6,
+                    justifyContent: 'flex-end',
+                  }}>
+                    {aha.content_worthy === 1 && (
+                      <button
+                        onClick={() =>
+                          sendToContentQueue(aha)}
+                        style={{
+                          padding: '4px 10px',
+                          background: 'var(--teal2)',
+                          border: 'none',
+                          borderRadius: 6,
+                          fontSize: 10,
+                          fontWeight: 700,
+                          color: 'var(--navy)',
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                        }}>
+                        → Content Queue
+                      </button>
+                    )}
                     <button
-                      onClick={() =>
-                        sendToContentQueue(aha)}
+                      type="button"
+                      onClick={async () => {
+                        if (!confirm(
+                          'Delete this aha moment?\nThis cannot be undone.'
+                        )) return;
+                        const db = await getDb();
+                        await db.execute(
+                          `DELETE FROM aha_moments
+WHERE aha_id = ?`,
+                          [aha.aha_id]
+                        );
+                        await db.execute(
+                          `INSERT INTO audit_log
+(log_id, action, entity_type,
+entity_id, details)
+VALUES (?, 'aha_deleted',
+'aha_moments', ?, ?)`,
+                          [
+                            uuidv4(),
+                            aha.aha_id,
+                            'Aha moment deleted',
+                          ]
+                        );
+                        await loadRecent();
+                      }}
                       style={{
-                        padding: '4px 10px',
-                        background: 'var(--teal2)',
-                        border: 'none',
+                        padding: '3px 10px',
+                        background: '#F05F5712',
+                        border: '1px solid #F05F57',
                         borderRadius: 6,
                         fontSize: 10,
-                        fontWeight: 700,
-                        color: 'var(--navy)',
+                        color: '#F05F57',
                         cursor: 'pointer',
-                        whiteSpace: 'nowrap',
+                        fontFamily:
+                          'Courier New, monospace',
                       }}>
-                      → Content Queue
+                      Delete
                     </button>
-                  )}
+                  </div>
                 </div>
               </div>
             </div>
