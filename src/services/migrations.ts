@@ -1058,4 +1058,113 @@ Captures: [what this answer builds in the voice library]
 Output the questions only. No preamble. No summary. No closing remarks. Questions, probes, and captures only.'
     );`,
   },
+  {
+    version: 31,
+    name: 'research_articles',
+    sql: `CREATE TABLE IF NOT EXISTS
+      research_articles (
+        article_id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        authors TEXT,
+        source TEXT NOT NULL,
+        source_type TEXT DEFAULT 'pubmed',
+        year INTEGER,
+        abstract TEXT,
+        url TEXT,
+        doi TEXT,
+        stz_layer TEXT,
+        status TEXT DEFAULT 'unread',
+        notes TEXT,
+        saved_at TEXT
+          DEFAULT (datetime('now')),
+        updated_at TEXT
+          DEFAULT (datetime('now'))
+      );
+    CREATE INDEX IF NOT EXISTS
+      idx_articles_source
+      ON research_articles(source_type);
+    CREATE INDEX IF NOT EXISTS
+      idx_articles_status
+      ON research_articles(status);`,
+  },
+
+  {
+    version: 32,
+    name: 'rss_feeds',
+    sql: `CREATE TABLE IF NOT EXISTS
+      rss_feeds (
+        feed_id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        url TEXT NOT NULL,
+        category TEXT DEFAULT 'ai',
+        active INTEGER DEFAULT 1,
+        last_fetched TEXT,
+        created_at TEXT
+          DEFAULT (datetime('now'))
+      );
+
+    CREATE TABLE IF NOT EXISTS
+      rss_items (
+        item_id TEXT PRIMARY KEY,
+        feed_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        link TEXT,
+        summary TEXT,
+        published_date TEXT,
+        captured INTEGER DEFAULT 0,
+        created_at TEXT
+          DEFAULT (datetime('now')),
+        FOREIGN KEY (feed_id)
+          REFERENCES rss_feeds(feed_id)
+      );
+
+    CREATE INDEX IF NOT EXISTS
+      idx_rss_items_feed
+      ON rss_items(feed_id);
+    CREATE INDEX IF NOT EXISTS
+      idx_rss_items_captured
+      ON rss_items(captured);
+
+    INSERT OR IGNORE INTO rss_feeds
+      (feed_id, name, url, category)
+    VALUES
+      ('feed_mit', 'MIT Technology Review',
+       'https://www.technologyreview.com/feed/',
+       'ai'),
+      ('feed_venturebeat',
+       'VentureBeat AI',
+       'https://venturebeat.com/feed/',
+       'ai'),
+      ('feed_elearning',
+       'eLearning Industry',
+       'https://elearningindustry.com/feed',
+       'ld'),
+      ('feed_insidehighered',
+       'Inside Higher Ed',
+       'https://www.insidehighered.com/rss/all',
+       'education'),
+      ('feed_towardsdatascience',
+       'Towards Data Science',
+       'https://towardsdatascience.com/feed',
+       'data'),
+      ('feed_hbr', 'Harvard Business Review',
+       'https://hbr.org/rss/all',
+       'business'),
+      ('feed_arxiv',
+       'Arxiv AI',
+       'https://arxiv.org/rss/cs.AI',
+       'research'),
+      ('feed_smallbiz',
+       'SmallBizTrends',
+       'https://smallbiztrends.com/feed',
+       'smallbiz'),
+      ('feed_aibusiness',
+       'AI Business',
+       'https://aibusiness.com/rss.xml',
+       'ai'),
+      ('feed_edusurge',
+       'EdSurge',
+       'https://www.edsurge.com/news.rss',
+       'education');`,
+  },
 ];

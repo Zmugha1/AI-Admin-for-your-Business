@@ -13,6 +13,7 @@ import { MyPipeline } from './modules/MyPipeline';
 import { BusinessGoals } from './modules/BusinessGoals';
 import { MyFinances } from './modules/MyFinances';
 import { GoogleIntegration } from './modules/GoogleIntegration';
+import { ResearchIntelligence } from './modules/ResearchIntelligence';
 import { ContentQueue } from './modules/ContentQueue';
 import { AuditLog } from './modules/AuditLog';
 import { DrRajDemo } from './modules/DrRajDemo';
@@ -30,6 +31,7 @@ type Page =
   | 'goals'
   | 'finances'
   | 'google'
+  | 'research'
   | 'vault'
   | 'audit'
   | 'raj_demo'
@@ -47,6 +49,7 @@ const NAV: { id: Page; label: string }[] = [
   { id: 'goals',    label: 'Business Goals'  },
   { id: 'finances', label: 'My Finances'     },
   { id: 'google',   label: 'Google Integration' },
+  { id: 'research', label: 'Research Intelligence' },
   { id: 'vault',    label: 'The Vault'       },
   { id: 'audit',    label: 'Audit Log'       },
   { id: 'raj_demo', label: 'Dr. Raj Demo'    },
@@ -240,6 +243,7 @@ export default function App() {
         {page === 'goals'    && <BusinessGoals />}
         {page === 'finances' && <MyFinances />}
         {page === 'google'   && <GoogleIntegration />}
+        {page === 'research' && <ResearchIntelligence />}
         {page === 'vault'    && <Placeholder title="The Vault" />}
         {page === 'audit'    && <AuditLog />}
         {page === 'raj_demo' && <DrRajDemo />}
