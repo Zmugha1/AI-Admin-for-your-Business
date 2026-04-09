@@ -308,6 +308,11 @@ export function MyPipeline() {
     );
   }
 
+  const listColumnBorder = selectedContactId
+    ? '1px solid #C8E8E5'
+    : '1px solid var(--mgray)';
+  const listColumnWidth = selectedContactId ? 320 : 280;
+
   return (
     <div style={{
       display: 'flex', height: '100vh',
@@ -316,9 +321,12 @@ export function MyPipeline() {
 
       {/* Left panel — list */}
       <div style={{
-        width: 280, minWidth: 280,
+        width: listColumnWidth,
+        minWidth: listColumnWidth,
+        height: '100vh',
+        overflowY: 'auto',
         background: 'var(--white)',
-        borderRight: '1px solid var(--mgray)',
+        borderRight: listColumnBorder,
         display: 'flex', flexDirection: 'column',
       }}>
         <div style={{
@@ -435,13 +443,15 @@ export function MyPipeline() {
                   '1px solid var(--lgray)',
                 borderLeft:
                   selected?.contact_id ===
-                  c.contact_id
-                    ? '3px solid var(--teal)'
+                  c.contact_id ||
+                  selectedContactId === c.contact_id
+                    ? '3px solid #3BBFBF'
                     : '3px solid transparent',
                 background:
                   selected?.contact_id ===
-                  c.contact_id
-                    ? 'rgba(59,191,191,0.05)'
+                  c.contact_id ||
+                  selectedContactId === c.contact_id
+                    ? '#3BBFBF18'
                     : 'transparent',
               }}>
               <div style={{
@@ -508,7 +518,62 @@ export function MyPipeline() {
         </div>
       </div>
 
-      {/* Right panel — detail or add form */}
+      {selectedContactId ? (
+        <div style={{
+          flex: 1,
+          height: '100vh',
+          overflowY: 'auto',
+          background: '#FEFAF5',
+          display: 'flex',
+          flexDirection: 'column',
+        }}>
+          <div style={{
+            position: 'sticky',
+            top: 0,
+            background: '#FEFAF5',
+            padding: '8px 16px',
+            borderBottom: '1px solid #C8E8E5',
+            zIndex: 10,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}>
+            <span style={{
+              fontFamily: 'Georgia, serif',
+              fontSize: 14,
+              fontWeight: 700,
+              color: '#2D4459',
+            }}>
+              {contacts.find(
+                x => x.contact_id === selectedContactId
+              )?.full_name ?? 'Contact'}
+            </span>
+            <button
+              type="button"
+              onClick={() =>
+                setSelectedContactId(null)}
+              style={{
+                background: 'transparent',
+                border: '1px solid #C8E8E5',
+                borderRadius: 6,
+                padding: '4px 12px',
+                fontSize: 11,
+                color: '#7A8F95',
+                cursor: 'pointer',
+              }}>
+              Close
+            </button>
+          </div>
+          <div style={{ flex: 1, overflowY: 'auto' }}>
+            <ClientCard
+              contactId={selectedContactId}
+              onClose={() =>
+                setSelectedContactId(null)}
+            />
+          </div>
+        </div>
+      ) : (
+      /* Right panel — detail or add form */
       <div style={{
         flex: 1, overflowY: 'auto',
         padding: '28px 32px',
@@ -1053,37 +1118,6 @@ export function MyPipeline() {
           </div>
         )}
       </div>
-
-      {selectedContactId && (
-        <div style={{
-          position: 'fixed',
-          top: 0, left: 0,
-          right: 0, bottom: 0,
-          background: 'rgba(45,68,89,0.55)',
-          zIndex: 1000,
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'center',
-          overflowY: 'auto',
-          padding: '24px',
-        }}>
-          <div style={{
-            background: '#FEFAF5',
-            borderRadius: 16,
-            width: '100%',
-            maxWidth: 900,
-            minHeight: '80vh',
-            position: 'relative',
-            boxShadow:
-              '0 20px 60px rgba(0,0,0,0.18)',
-          }}>
-            <ClientCard
-              contactId={selectedContactId}
-              onClose={() =>
-                setSelectedContactId(null)}
-            />
-          </div>
-        </div>
       )}
     </div>
   );
