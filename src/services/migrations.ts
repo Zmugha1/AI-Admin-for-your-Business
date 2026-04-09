@@ -1167,4 +1167,81 @@ Output the questions only. No preamble. No summary. No closing remarks. Question
        'https://www.edsurge.com/news.rss',
        'education');`,
   },
+
+  {
+    version: 33,
+    name: 'pre_meeting_intelligence_fields',
+    sql: `ALTER TABLE contacts
+      ADD COLUMN life_context TEXT;
+    ALTER TABLE contacts
+      ADD COLUMN business_context TEXT;
+    ALTER TABLE contacts
+      ADD COLUMN communication_style TEXT;
+    ALTER TABLE contacts
+      ADD COLUMN topics_to_raise TEXT;
+    ALTER TABLE contacts
+      ADD COLUMN topics_to_avoid TEXT;
+    ALTER TABLE contacts
+      ADD COLUMN last_meeting_summary TEXT;
+
+    INSERT OR IGNORE INTO jobs_menu
+      (job_id, category, name,
+       input_description, output_description,
+       price_low, price_high, is_custom,
+       active)
+    VALUES (
+      'pre_meeting_brief',
+      'intelligence',
+      'Pre-Meeting Intelligence Brief',
+      'Contact name + optional transcript',
+      'One-page brief: who they are, what to bring up, what to listen for, what to avoid',
+      0, 0, 0, 1
+    );
+
+    INSERT OR IGNORE INTO prompts
+      (prompt_id, job_id, version,
+       system_template, user_template)
+    VALUES (
+      'p_pre_meeting_brief_v1',
+      'pre_meeting_brief',
+      1,
+      'You are Dr. Zubia Mughal, founder of Dr. Data Decision Intelligence LLC. {{identity}}
+
+You are preparing for a meeting with a client or prospect. Your job is to generate a pre-meeting intelligence brief using only the context provided. Do not invent details. Do not use generic consultant language. Write in a warm, direct, observational tone that sounds like Dr. Zubia preparing her own notes.
+
+Rules:
+- Use only the context provided
+- Never invent details not in the context
+- Write in first person as Dr. Zubia
+- No em dashes ever, use commas or periods
+- No generic AI language
+- Every section must be grounded in the context provided
+- If context is missing for a section say so honestly
+- Sound like an expert preparing for a real conversation not a template
+
+Structure the brief exactly like this:
+
+WHO THIS PERSON IS
+[2 to 3 sentences on who they are, what matters to them, where they are right now professionally]
+
+WHAT TO BRING UP
+[3 specific items based on context, each one sentence, grounded in what is stored about them]
+
+WHAT TO LISTEN FOR
+[2 signals this person may send that indicate something has changed or something important is on their mind]
+
+ONE ANALOGY THAT MIGHT LAND
+[based on their vertical and background, one comparison that could help explain decision intelligence or AI in terms they already understand]
+
+WHAT NOT TO DO
+[1 to 2 things to avoid based on their communication style or background]
+
+OPEN QUESTIONS
+[2 questions worth asking early in the meeting to surface what matters most right now]',
+
+      'Generate a pre-meeting intelligence brief for this contact and context:
+
+{{input}}'
+    );`,
+  },
 ];
