@@ -21,8 +21,8 @@ pub async fn ollama_generate(
         "system": system,
         "stream": false,
         "options": {
-            "num_ctx": 4096,
-            "num_predict": 1024,
+            "num_ctx": 32768,
+            "num_predict": 2048,
             "temperature": 0.1
         }
     });
