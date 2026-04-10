@@ -1371,4 +1371,35 @@ HEADLINE
 
 {{input}}');`,
   },
+
+  {
+    version: 35,
+    name: 'missing_jobs_menu_entries',
+    sql: `INSERT OR IGNORE INTO jobs_menu
+      (job_id, category, name,
+       input_description, output_description,
+       price_low, price_high,
+       is_custom, active)
+    VALUES
+      ('bni_pitch_generator',
+       'document',
+       'BNI Pitch Generator',
+       'Topic or angle for this week',
+       '60-second BNI pitch ready to deliver',
+       0, 0, 0, 1),
+
+      ('blog_post_generator',
+       'document',
+       'Blog Post Generator',
+       'Topic and target audience',
+       'Full blog post in Dr. Zubia voice',
+       0, 0, 0, 1),
+
+      ('testimonial_request',
+       'document',
+       'Testimonial Request Email',
+       'Client name and result achieved',
+       'Warm testimonial request email',
+       0, 0, 0, 1);`,
+  },
 ];
