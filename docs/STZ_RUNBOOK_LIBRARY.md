@@ -116,3 +116,57 @@ Watch out for: Never push to main.
   Never git add . — always specific files.
   Never proceed if tsc reports errors.
 
+## RUN-006
+Task: Clear stuck job queue rows
+Trigger: Jobs stuck in running or pending
+  and the poller will not advance
+Steps:
+  1. Run sqlite3 against the app database:
+     UPDATE job_queue SET status = 'failed',
+     error_message = 'Manually cleared',
+     completed_at = datetime('now') WHERE
+     status IN ('running','pending');
+  2. Restart the app
+  3. Run a simple test job (for example
+     Follow Up Email) and confirm pending,
+     running, then done
+Expected output: Jobs complete successfully
+  and new work is not blocked
+Watch out for: Clear or fail stuck rows
+  before expecting new pending jobs to run;
+  a stuck running row used to deadlock until
+  the 600s timeout fix (still clear manually
+  if needed)
+
+## RUN-007
+Task: Full app restart sequence (Windows)
+Trigger: Port 1420 in use or app frozen
+Steps:
+  1. taskkill /F /IM zubia-pulse.exe
+  2. taskkill /F /IM node.exe
+  3. Start-Sleep -Seconds 2
+  4. npm run tauri dev
+Expected output: Dev server and app start
+  clean with no port bind errors
+Watch out for: Killing zubia-pulse.exe alone
+  often leaves node.exe holding port 1420
+
+## RUN-008
+Task: Test job queue end-to-end
+Trigger: After any Ollama, ollama.rs, or
+  jobQueueService change
+Steps:
+  1. Open Run a Job in the app
+  2. Select Follow Up Email
+  3. Paste two to three sentences of input
+  4. Click Add to Queue
+  5. Watch status move pending, running, done
+  6. Read output and confirm voice matches
+     Dr. Zubia, not generic AI filler
+Expected output: Job completes in about
+  30 to 60 seconds with usable output
+Watch out for: Pending forever means the
+  poller is not running. Running longer than
+  10 minutes means timeout logic missing or
+  Ollama stuck; check ollama serve and logs
+

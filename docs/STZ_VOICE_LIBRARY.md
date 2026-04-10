@@ -82,3 +82,36 @@ Example bad: "While the data exists and
   and decision-making."
 STZ source: L1 Q2 — writing style
 
+## VOICE-008
+Rule: Never use the word seamless in any
+  output ever
+Example good: The system handles follow-ups
+  automatically so you never miss a lead.
+Example bad: We create a seamless process
+  that turns leads into clients.
+STZ source: L1 Q2 — terminology rules
+
+## VOICE-009
+Rule: BNI pitch memory hook must always end
+  with exact words: The data exists. The
+  workflow does not. I build the bridge.
+  Then sign-off: Dr. Zubia Mughal. Dr. Data
+  Decision Intelligence LLC.
+Example good: The data exists. The workflow
+  does not. I build the bridge. Dr. Zubia
+  Mughal. Dr. Data Decision Intelligence LLC.
+Example bad: Data in, results out. Thanks
+  for your referrals.
+STZ source: L1 Q2 — brand language
+
+## VOICE-010
+Rule: BNI pitch maximum 150 words. One story
+  only. One pain point only. Never combine
+  three client stories in one pitch; pick
+  the strongest single story.
+Example good: One therapist story, one
+  referral trigger, then the exact memory hook.
+Example bad: Therapist plus realtor plus
+  Jeff all stacked in one 60-second pitch.
+STZ source: L1 Q5 — quality criteria
+

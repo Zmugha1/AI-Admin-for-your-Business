@@ -163,3 +163,102 @@ Never do: Change migration version numbers
   without first checking what versions
   are already in the database
 
+## ADR-011
+Date: 2026-04-09
+Decision: Client card opens as inline split
+  panel, not a full-page overlay
+Layer: Tech
+Context: Overlay covered the contact list
+  and broke scanability of the pipeline
+Consequence: Contact list stays visible on
+  the left; the card opens on the right
+Never do: Use fixed-position full-page
+  overlays for client detail views
+
+## ADR-012
+Date: 2026-04-09
+Decision: Ollama context window (num_ctx)
+  set to 32768 for long transcript processing
+Layer: Tech
+Context: Default context was too small for
+  large pasted transcripts in Pre-Meeting Brief
+Consequence: Rust ollama_generate request body
+  uses num_ctx 32768 in ollama.rs
+Never do: Shrink num_ctx below what long
+  transcript flows need without measuring
+
+## ADR-013
+Date: 2026-04-09
+Decision: Ollama HTTP client timeout increased
+  to 600 seconds (10 minutes)
+Layer: Tech
+Context: Two-minute timeout aborted long
+  generations before the model finished
+Consequence: reqwest client in ollama.rs uses
+  Duration::from_secs(600)
+Never do: Use a sub-600s timeout for flows
+  that may process long transcripts or briefs
+
+## ADR-014
+Date: 2026-04-09
+Decision: Job queue poller must recover from
+  stuck running jobs by timing them out after
+  600 seconds, then continue processing
+Layer: Tech
+Context: Any row left in running forever
+  deadlocked the entire queue
+Consequence: processNextJob marks stale
+  running rows failed, then picks pending work
+Never do: Return early on any running job
+  without a started_at timeout check
+
+## ADR-015
+Date: 2026-04-09
+Decision: ollama_generate is implemented in
+  src-tauri/src/ollama.rs, not main.rs or lib.rs
+Layer: Tech
+Context: lib.rs only registers commands;
+  HTTP options and model live in the ollama module
+Consequence: All num_ctx, num_predict, timeout,
+  and model name changes go through ollama.rs
+Never do: Search main.rs or lib.rs only when
+  tuning Ollama request behavior
+
+## ADR-016
+Date: 2026-04-09
+Decision: BNI pitch prompt enforces strict
+  150-word limit and exact memory hook and
+  sign-off wording (prompt v2 in DB)
+Layer: L1
+Context: v1 output was too long and generic
+Consequence: Migration updates p_bni_pitch_v1
+  system_template and bumps prompt version to 2
+Never do: Ship BNI pitch prompts without
+  explicit word cap and fixed hook lines
+
+## ADR-017
+Date: 2026-04-09
+Decision: jobs_menu entries and prompts rows
+  are seeded separately; both are required for
+  Run a Job visibility and execution
+Layer: Tech
+Context: Prompts without jobs_menu rows left
+  jobs invisible in the UI
+Consequence: New jobs need a migration that
+  inserts jobs_menu (and usually prompts)
+Never do: Seed prompts for a job_id without
+  confirming jobs_menu contains that job_id
+
+## ADR-018
+Date: 2026-04-09
+Decision: fetch() is allowed for RSS and
+  external HTTP APIs; localhost Ollama stays
+  behind invoke() only
+Layer: Tech
+Context: CSP and Tauri patterns block direct
+  browser fetch to Ollama, not all HTTP
+Consequence: Research RSS and public APIs may
+  use fetch; Ollama uses ollama_generate only
+Never do: Use fetch() to localhost:11434 from
+  the frontend
+

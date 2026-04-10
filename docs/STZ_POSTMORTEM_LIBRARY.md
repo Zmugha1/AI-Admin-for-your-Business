@@ -102,3 +102,88 @@ Prevention rule: Always verify
   building any new module
 Commit: 5ad79a4
 
+## INC-006
+Date: 2026-04-09
+What broke: Job queue stopped processing;
+  jobs stuck in running forever
+Root cause: Poller returned immediately if
+  any row had status running, so a stuck run
+  never cleared and pending work starved
+Fix applied: If running job started_at is
+  older than 600 seconds, mark it failed
+  with Timed out after 600s, then continue
+Prevention rule: Never rely on a bare
+  running check without a timeout path
+Commit: d146c14
+
+## INC-007
+Date: 2026-04-09
+What broke: Ollama connection or generation
+  failed on long pasted transcripts
+Root cause: num_ctx too small for combined
+  system, user, and transcript tokens
+Fix applied: Increased num_ctx to 32768 in
+  ollama.rs options for ollama_generate
+Prevention rule: Do not assume default
+  context fits long transcript ingestion
+Commit: 1acde50
+
+## INC-008
+Date: 2026-04-09
+What broke: Long-running Ollama calls aborted
+  before completion
+Root cause: reqwest client timeout was 120s
+Fix applied: Increased client timeout to 600s
+Prevention rule: Keep LLM timeouts aligned
+  with worst-case transcript and brief length
+Commit: 1c5d6b9
+
+## INC-009
+Date: 2026-04-09
+What broke: BNI pitch output too long and
+  generic; weak memory hook
+Root cause: Prompt allowed flexible structure
+  without hard word cap or exact closing lines
+Fix applied: Migration 36 (prompt v2) with
+  150-word max, exact memory hook, sign-off,
+  and referral trigger text
+Prevention rule: Treat BNI pitch as a
+  constrained performance script, not a essay
+Commit: 84905ed
+
+## INC-010
+Date: 2026-04-09
+What broke: Jobs existed in prompts table
+  but did not appear in Run a Job UI
+Root cause: jobs_menu had no rows for those
+  job_id values; UI lists from jobs_menu
+Fix applied: Migration 35 seeded bni_pitch_generator,
+  blog_post_generator, testimonial_request
+Prevention rule: Always pair prompt seeds with
+  jobs_menu seeds for operator-visible jobs
+Commit: f191987
+
+## INC-011
+Date: 2026-04-09
+What broke: Port 1420 already in use on
+  dev restart; app would not bind
+Root cause: node.exe from prior Vite or
+  Tauri dev session still held the port
+Fix applied: taskkill /F /IM node.exe before
+  restarting npm run tauri dev
+Prevention rule: Kill node.exe, not only
+  zubia-pulse.exe, when freeing dev ports
+Commit: n/a (operational)
+
+## INC-012
+Date: 2026-04-09
+What broke: Client card overlay covered the
+  full page and hid the contact list
+Root cause: Modal or overlay layout for
+  detail view instead of persistent list context
+Fix applied: Inline split panel: list left,
+  card right, no full-page overlay
+Prevention rule: Keep pipeline list visible
+  while editing a single contact
+Commit: bdc189b
+
