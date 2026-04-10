@@ -21,11 +21,33 @@ export async function enqueueJob(
 export async function processNextJob(): Promise<void> {
   const db = await getDb();
 
-  const running = await db.select<{ queue_id: string }[]>(
-    `SELECT queue_id FROM job_queue
-     WHERE status = 'running' LIMIT 1`
+  const runningJob = await db.select<
+    { queue_id: string; started_at: string }[]
+  >(
+    `SELECT queue_id, started_at
+     FROM job_queue
+     WHERE status = 'running'
+     LIMIT 1`
   );
-  if (running.length > 0) return;
+
+  if (runningJob.length > 0) {
+    const startedAt = new Date(
+      runningJob[0].started_at
+    ).getTime();
+    const now = Date.now();
+    const elapsedSeconds = (now - startedAt) / 1000;
+    if (elapsedSeconds < 600) {
+      return;
+    }
+    await db.execute(
+      `UPDATE job_queue
+       SET status = 'failed',
+         error_message = 'Timed out after 600s',
+         completed_at = datetime('now')
+       WHERE queue_id = ?`,
+      [runningJob[0].queue_id]
+    );
+  }
 
   const pending = await db.select<{
     queue_id: string;
@@ -123,6 +145,22 @@ export async function processNextJob(): Promise<void> {
        WHERE queue_id = ?`,
       [String(err), job.queue_id]
     );
+    try {
+      await db.execute(
+        `INSERT INTO audit_log
+         (log_id, action, entity_type,
+          entity_id, details)
+         VALUES (?, 'job_failed', 'job_queue',
+                 ?, ?)`,
+        [
+          crypto.randomUUID(),
+          job.queue_id,
+          String(err),
+        ]
+      );
+    } catch {
+      console.error('Failed to log job error');
+    }
   }
 }
 

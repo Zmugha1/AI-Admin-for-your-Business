@@ -69,7 +69,9 @@ export function RunAJob() {
          ORDER BY created_at DESC LIMIT 20`
       );
       setQueue(rows);
-    } catch {}
+    } catch (e) {
+      console.error('Queue poll error:', e);
+    }
   }, []);
 
   useEffect(() => {
