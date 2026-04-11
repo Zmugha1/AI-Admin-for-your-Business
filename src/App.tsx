@@ -77,7 +77,9 @@ export default function App() {
   const [page, setPage] = useState<Page>('morning');
   const [ready, setReady] = useState(false);
   const [initError, setInitError] = useState<string | null>(null);
-  const { isConnected } = useOllamaStatus();
+  const { isConnected, recheck } = useOllamaStatus();
+  const [ollamaStartBusy, setOllamaStartBusy] =
+    useState(false);
 
   useEffect(() => {
     runMigrations(ALL_MIGRATIONS)
@@ -141,30 +143,122 @@ export default function App() {
           }}>
             Dr. Zubia's Pulse
           </div>
-          <div style={{
-            fontSize: 10, color: 'var(--slate)',
-            fontFamily: 'Courier New, monospace',
-            display: 'flex',
-            alignItems: 'center', gap: 5,
-          }}>
-            <span style={{
-              width: 6, height: 6,
-              borderRadius: '50%',
-              background:
-                isConnected === null
-                  ? 'var(--slate)'
-                  : isConnected
-                  ? 'var(--green)'
-                  : 'var(--coral)',
-              display: 'inline-block',
-              flexShrink: 0,
-            }} />
-            {isConnected === null
-              ? 'checking...'
-              : isConnected
-              ? 'ollama connected'
-              : 'ollama offline'}
-          </div>
+          {isConnected === true ? (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '6px 10px',
+              borderRadius: 8,
+              background: '#3A7D5C18',
+            }}>
+              <div style={{
+                width: 7, height: 7,
+                borderRadius: '50%',
+                background: '#3A7D5C',
+                flexShrink: 0,
+              }} />
+              <span style={{
+                fontSize: 10,
+                color: '#3A7D5C',
+                fontFamily: 'Courier New, monospace',
+              }}>
+                ollama connected
+              </span>
+            </div>
+          ) : (
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 6,
+              padding: '6px 10px',
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+              }}>
+                <div style={{
+                  width: 7, height: 7,
+                  borderRadius: '50%',
+                  background:
+                    ollamaStartBusy ||
+                    isConnected === null
+                      ? '#7A8F95'
+                      : '#F05F57',
+                  flexShrink: 0,
+                }} />
+                <span style={{
+                  fontSize: 10,
+                  color:
+                    ollamaStartBusy ||
+                    isConnected === null
+                      ? '#7A8F95'
+                      : '#F05F57',
+                  fontFamily: 'Courier New, monospace',
+                }}>
+                  {ollamaStartBusy
+                    ? 'starting ollama...'
+                    : isConnected === null
+                    ? 'checking...'
+                    : 'ollama offline'}
+                </span>
+              </div>
+              <button
+                type="button"
+                disabled={
+                  ollamaStartBusy ||
+                  isConnected === null
+                }
+                onClick={async () => {
+                  try {
+                    const { invoke } = await import(
+                      '@tauri-apps/api/core'
+                    );
+                    setOllamaStartBusy(true);
+                    const result =
+                      await invoke<string>(
+                        'start_ollama'
+                      );
+                    console.log(result);
+                    setTimeout(() => {
+                      void recheck();
+                      setOllamaStartBusy(false);
+                    }, 3000);
+                  } catch (err) {
+                    console.error(
+                      'Failed to start Ollama:',
+                      err
+                    );
+                    void recheck();
+                    setOllamaStartBusy(false);
+                  }
+                }}
+                style={{
+                  padding: '5px 10px',
+                  background:
+                    ollamaStartBusy ||
+                    isConnected === null
+                      ? '#7A8F95'
+                      : '#3BBFBF',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: 6,
+                  fontSize: 10,
+                  fontWeight: 700,
+                  cursor:
+                    ollamaStartBusy ||
+                    isConnected === null
+                      ? 'default'
+                      : 'pointer',
+                  fontFamily: 'Courier New, monospace',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                START AI
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Nav */}
