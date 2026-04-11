@@ -17,6 +17,92 @@ const C = {
   green: '#3A7D5C',
 };
 
+interface Source {
+  source_id: string;
+  title: string;
+  type:
+    | 'government'
+    | 'peer_review'
+    | 'regulatory'
+    | 'clinical'
+    | 'education'
+    | 'intelligence'
+    | 'practice';
+  year: string;
+  url: string;
+  domain: string;
+  active: boolean;
+}
+
+const DRUG_SAFETY_SOURCES: Source[] = [
+  {
+    source_id: 'src_nih_fiau',
+    title:
+      'NIH Clinical Center Report, Fialuridine Trial',
+    type: 'government',
+    year: '1994',
+    url: 'https://www.nih.gov',
+    domain: 'Clinical Outcomes',
+    active: true,
+  },
+  {
+    source_id: 'src_nejm_fiau',
+    title:
+      'New England Journal of Medicine, ' +
+      'Fialuridine Hepatotoxicity',
+    type: 'peer_review',
+    year: '1995',
+    url: 'https://www.nejm.org',
+    domain: 'Mechanism and Outcomes',
+    active: true,
+  },
+  {
+    source_id: 'src_fda_fiau',
+    title:
+      'FDA Drug Safety Communication, FIAU Clinical Hold',
+    type: 'regulatory',
+    year: '1994',
+    url: 'https://www.fda.gov',
+    domain: 'Regulatory Record',
+    active: true,
+  },
+  {
+    source_id: 'src_endpoint',
+    title: 'Endpoint News, Pharma Intelligence Feed',
+    type: 'intelligence',
+    year: 'ongoing',
+    url: 'https://endpointsnews.com',
+    domain: 'Sponsor Communications',
+    active: false,
+  },
+  {
+    source_id: 'src_pubmed_mito',
+    title: 'PubMed, Mitochondrial Toxicity Literature',
+    type: 'peer_review',
+    year: 'ongoing',
+    url: 'https://pubmed.ncbi.nlm.nih.gov',
+    domain: 'Pharmacology',
+    active: true,
+  },
+  {
+    source_id: 'src_foia',
+    title: 'FOIA Request Database, FDA Records',
+    type: 'government',
+    year: 'ongoing',
+    url:
+      'https://www.fda.gov/regulatory-information/freedom-information',
+    domain: 'Sponsor Records',
+    active: false,
+  },
+];
+
+const AGENT_SOURCE_IDS: string[][] = [
+  ['src_nih_fiau', 'src_nejm_fiau', 'src_pubmed_mito'],
+  ['src_fda_fiau', 'src_foia', 'src_endpoint'],
+  ['src_nejm_fiau', 'src_pubmed_mito'],
+  ['src_endpoint', 'src_foia'],
+];
+
 type Conf = 'High' | 'Medium' | 'Low';
 
 const AGENTS: {
@@ -177,6 +263,90 @@ function ConfDot({ level }: { level: Conf }) {
   );
 }
 
+function SourceCitedPills({
+  sourceIds,
+  sources,
+}: {
+  sourceIds: string[];
+  sources: Source[];
+}) {
+  return (
+    <div
+      style={{
+        marginTop: 12,
+        borderTop: `1px solid ${C.lgray}`,
+        paddingTop: 10,
+      }}
+    >
+      <div
+        style={{
+          fontFamily: 'Courier New, monospace',
+          fontSize: 9,
+          color: C.slate,
+          marginBottom: 6,
+          textTransform: 'uppercase',
+          letterSpacing: '0.06em',
+        }}
+      >
+        SOURCES CITED
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+        }}
+      >
+        {sourceIds.map(id => {
+          const src = sources.find(
+            s => s.source_id === id
+          );
+          if (!src) return null;
+          const act = src.active;
+          return (
+            <span
+              key={id}
+              title={
+                !act
+                  ? 'Source not active - add subscription or access to enable'
+                  : undefined
+              }
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                background: act ? '#3BBFBF18' : '#F05F5712',
+                border: act
+                  ? '1px solid #3BBFBF'
+                  : '1px solid #F05F57',
+                color: act ? '#2D4459' : '#F05F57',
+                fontFamily: 'Courier New, monospace',
+                fontSize: 9,
+                padding: '2px 8px',
+                borderRadius: 20,
+                marginRight: 4,
+                marginBottom: 4,
+              }}
+            >
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: 6,
+                  height: 6,
+                  borderRadius: '50%',
+                  background: act ? '#3A7D5C' : '#F05F57',
+                  marginRight: 4,
+                  flexShrink: 0,
+                }}
+              />
+              {src.title}
+            </span>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 const DEFAULT_DRUG =
   'Fialuridine (FIAU), 1993 hepatotoxicity trial halt';
 
@@ -190,6 +360,20 @@ export default function DrugSafetyCouncil() {
   const [agentShown, setAgentShown] = useState(0);
   const [critShown, setCritShown] = useState(0);
   const [audit, setAudit] = useState('');
+  const [sources, setSources] = useState<Source[]>(
+    DRUG_SAFETY_SOURCES
+  );
+  const [showSources, setShowSources] =
+    useState(false);
+  const [showAddSource, setShowAddSource] =
+    useState(false);
+  const [newSource, setNewSource] = useState({
+    title: '',
+    type: 'peer_review' as Source['type'],
+    year: '',
+    url: '',
+    domain: '',
+  });
   const timers = useRef<
     ReturnType<typeof setTimeout>[]
   >([]);
@@ -428,6 +612,10 @@ export default function DrugSafetyCouncil() {
                 Key flag: {ag.flag}
               </span>
             </div>
+            <SourceCitedPills
+              sourceIds={AGENT_SOURCE_IDS[i]}
+              sources={sources}
+            />
           </div>
         ))}
 
@@ -734,6 +922,579 @@ export default function DrugSafetyCouncil() {
                   </li>
                 </ul>
               </div>
+            </div>
+
+            <div
+              style={{
+                borderTop: `1px solid ${C.mint}`,
+                marginTop: 18,
+                paddingTop: 16,
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 10,
+                  marginBottom:
+                    showSources || showAddSource ? 12 : 0,
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: 'Courier New, monospace',
+                    fontSize: 11,
+                    color: C.navy,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                  }}
+                >
+                  INTELLIGENCE SOURCES
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: 8,
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowSources(v => !v)
+                    }
+                    style={{
+                      padding: '6px 14px',
+                      background: 'transparent',
+                      color: C.teal,
+                      border: `1px solid ${C.teal}`,
+                      borderRadius: 8,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      fontFamily:
+                        'Trebuchet MS, sans-serif',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Manage Sources
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowAddSource(v => !v)
+                    }
+                    style={{
+                      padding: '6px 14px',
+                      background: C.teal,
+                      color: C.white,
+                      border: 'none',
+                      borderRadius: 8,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      fontFamily:
+                        'Trebuchet MS, sans-serif',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Add Source
+                  </button>
+                </div>
+              </div>
+              {showSources ? (
+                <div
+                  style={{
+                    borderRadius: 8,
+                    overflow: 'hidden',
+                    border: `1px solid ${C.mint}`,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns:
+                        '100px minmax(0,1.4fr) 100px minmax(0,1fr) 72px 88px',
+                      gap: 0,
+                      alignItems: 'center',
+                      padding: '8px 12px',
+                      background: C.lgray,
+                      borderBottom: `1px solid ${C.mint}`,
+                      fontFamily: 'Courier New, monospace',
+                      fontSize: 9,
+                      color: C.slate,
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    <div>Status</div>
+                    <div>Title</div>
+                    <div>Type</div>
+                    <div>Domain</div>
+                    <div>Year</div>
+                    <div style={{ textAlign: 'right' }}>
+                      &nbsp;
+                    </div>
+                  </div>
+                  {sources.map((row, ri) => (
+                    <div
+                      key={row.source_id}
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns:
+                          '100px minmax(0,1.4fr) 100px minmax(0,1fr) 72px 88px',
+                        gap: 0,
+                        alignItems: 'center',
+                        padding: '8px 12px',
+                        background:
+                          ri % 2 === 0 ? C.white : C.cream,
+                        borderBottom: `1px solid ${C.mint}`,
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          fontFamily: 'Courier New, monospace',
+                          fontSize: 10,
+                          color: row.active
+                            ? C.green
+                            : C.coral,
+                        }}
+                      >
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            width: 8,
+                            height: 8,
+                            borderRadius: '50%',
+                            background: row.active
+                              ? C.green
+                              : C.coral,
+                            flexShrink: 0,
+                          }}
+                        />
+                        {row.active ? 'Active' : 'Inactive'}
+                      </div>
+                      <div>
+                        {row.url ? (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              window.open(
+                                row.url,
+                                '_blank'
+                              )
+                            }
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              padding: 0,
+                              margin: 0,
+                              fontFamily:
+                                'Trebuchet MS, sans-serif',
+                              fontSize: 12,
+                              color: C.teal,
+                              cursor: 'pointer',
+                              textAlign: 'left',
+                              textDecoration: 'underline',
+                            }}
+                          >
+                            {row.title}
+                          </button>
+                        ) : (
+                          <span
+                            style={{
+                              fontFamily:
+                                'Trebuchet MS, sans-serif',
+                              fontSize: 12,
+                              color: C.navy,
+                            }}
+                          >
+                            {row.title}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            background: C.mint,
+                            color: C.navy,
+                            fontFamily:
+                              'Courier New, monospace',
+                            fontSize: 9,
+                            textTransform: 'uppercase',
+                            padding: '2px 8px',
+                            borderRadius: 20,
+                          }}
+                        >
+                          {row.type.replace(/_/g, ' ')}
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          fontFamily:
+                            'Trebuchet MS, sans-serif',
+                          fontSize: 11,
+                          color: C.slate,
+                        }}
+                      >
+                        {row.domain}
+                      </div>
+                      <div
+                        style={{
+                          fontFamily: 'Courier New, monospace',
+                          fontSize: 10,
+                          color: C.slate,
+                        }}
+                      >
+                        {row.year}
+                      </div>
+                      <div
+                        style={{
+                          textAlign: 'right',
+                        }}
+                      >
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setSources(prev =>
+                              prev.map(s =>
+                                s.source_id ===
+                                row.source_id
+                                  ? {
+                                      ...s,
+                                      active: !s.active,
+                                    }
+                                  : s
+                              )
+                            )
+                          }
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            fontSize: 11,
+                            fontWeight: 600,
+                            fontFamily:
+                              'Trebuchet MS, sans-serif',
+                            cursor: 'pointer',
+                            color: row.active
+                              ? C.coral
+                              : C.teal,
+                          }}
+                        >
+                          {row.active
+                            ? 'Deactivate'
+                            : 'Activate'}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+              {showAddSource ? (
+                <div
+                  style={{
+                    border: `1px solid ${C.mint}`,
+                    borderTop: `4px solid ${C.teal}`,
+                    background: C.white,
+                    padding: '16px 20px',
+                    borderRadius: 12,
+                    marginTop: 12,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: '12px 16px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        gridColumn: '1 / -1',
+                      }}
+                    >
+                      <label
+                        style={{
+                          display: 'block',
+                          fontSize: 10,
+                          color: C.slate,
+                          marginBottom: 4,
+                          fontFamily:
+                            'Courier New, monospace',
+                        }}
+                      >
+                        Title
+                      </label>
+                      <input
+                        type="text"
+                        value={newSource.title}
+                        onChange={e =>
+                          setNewSource(ns => ({
+                            ...ns,
+                            title: e.target.value,
+                          }))
+                        }
+                        style={{
+                          width: '100%',
+                          boxSizing: 'border-box',
+                          padding: '8px 10px',
+                          border: `1px solid ${C.mint}`,
+                          borderRadius: 8,
+                          fontSize: 13,
+                          color: C.navy,
+                          fontFamily:
+                            'Trebuchet MS, sans-serif',
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label
+                        style={{
+                          display: 'block',
+                          fontSize: 10,
+                          color: C.slate,
+                          marginBottom: 4,
+                          fontFamily:
+                            'Courier New, monospace',
+                        }}
+                      >
+                        Type
+                      </label>
+                      <select
+                        value={newSource.type}
+                        onChange={e =>
+                          setNewSource(ns => ({
+                            ...ns,
+                            type: e.target
+                              .value as Source['type'],
+                          }))
+                        }
+                        style={{
+                          width: '100%',
+                          boxSizing: 'border-box',
+                          padding: '8px 10px',
+                          border: `1px solid ${C.mint}`,
+                          borderRadius: 8,
+                          fontSize: 13,
+                          color: C.navy,
+                          fontFamily:
+                            'Trebuchet MS, sans-serif',
+                        }}
+                      >
+                        {(
+                          [
+                            'government',
+                            'peer_review',
+                            'regulatory',
+                            'clinical',
+                            'education',
+                            'intelligence',
+                            'practice',
+                          ] as const
+                        ).map(t => (
+                          <option key={t} value={t}>
+                            {t}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label
+                        style={{
+                          display: 'block',
+                          fontSize: 10,
+                          color: C.slate,
+                          marginBottom: 4,
+                          fontFamily:
+                            'Courier New, monospace',
+                        }}
+                      >
+                        Domain
+                      </label>
+                      <input
+                        type="text"
+                        value={newSource.domain}
+                        onChange={e =>
+                          setNewSource(ns => ({
+                            ...ns,
+                            domain: e.target.value,
+                          }))
+                        }
+                        style={{
+                          width: '100%',
+                          boxSizing: 'border-box',
+                          padding: '8px 10px',
+                          border: `1px solid ${C.mint}`,
+                          borderRadius: 8,
+                          fontSize: 13,
+                          color: C.navy,
+                          fontFamily:
+                            'Trebuchet MS, sans-serif',
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label
+                        style={{
+                          display: 'block',
+                          fontSize: 10,
+                          color: C.slate,
+                          marginBottom: 4,
+                          fontFamily:
+                            'Courier New, monospace',
+                        }}
+                      >
+                        Year
+                      </label>
+                      <input
+                        type="text"
+                        value={newSource.year}
+                        onChange={e =>
+                          setNewSource(ns => ({
+                            ...ns,
+                            year: e.target.value,
+                          }))
+                        }
+                        style={{
+                          width: '100%',
+                          boxSizing: 'border-box',
+                          padding: '8px 10px',
+                          border: `1px solid ${C.mint}`,
+                          borderRadius: 8,
+                          fontSize: 13,
+                          color: C.navy,
+                          fontFamily:
+                            'Trebuchet MS, sans-serif',
+                        }}
+                      />
+                    </div>
+                    <div
+                      style={{
+                        gridColumn: '1 / -1',
+                      }}
+                    >
+                      <label
+                        style={{
+                          display: 'block',
+                          fontSize: 10,
+                          color: C.slate,
+                          marginBottom: 4,
+                          fontFamily:
+                            'Courier New, monospace',
+                        }}
+                      >
+                        URL
+                      </label>
+                      <input
+                        type="text"
+                        value={newSource.url}
+                        onChange={e =>
+                          setNewSource(ns => ({
+                            ...ns,
+                            url: e.target.value,
+                          }))
+                        }
+                        style={{
+                          width: '100%',
+                          boxSizing: 'border-box',
+                          padding: '8px 10px',
+                          border: `1px solid ${C.mint}`,
+                          borderRadius: 8,
+                          fontSize: 13,
+                          color: C.navy,
+                          fontFamily:
+                            'Trebuchet MS, sans-serif',
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: 10,
+                      marginTop: 16,
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const t =
+                          newSource.title.trim();
+                        if (!t) return;
+                        const slug = t
+                          .toLowerCase()
+                          .replace(/[^a-z0-9]+/g, '_')
+                          .replace(/^_|_$/g, '')
+                          .slice(0, 40);
+                        const source_id =
+                          `src_${slug || 'new'}_${Date.now()}`;
+                        setSources(prev => [
+                          ...prev,
+                          {
+                            source_id,
+                            title: t,
+                            type: newSource.type,
+                            year:
+                              newSource.year.trim() ||
+                              'ongoing',
+                            url: newSource.url.trim(),
+                            domain:
+                              newSource.domain.trim() ||
+                              'General',
+                            active: true,
+                          },
+                        ]);
+                        setNewSource({
+                          title: '',
+                          type: 'peer_review',
+                          year: '',
+                          url: '',
+                          domain: '',
+                        });
+                        setShowAddSource(false);
+                      }}
+                      style={{
+                        padding: '10px 20px',
+                        background: C.teal,
+                        color: C.white,
+                        border: 'none',
+                        borderRadius: 8,
+                        fontSize: 13,
+                        fontWeight: 700,
+                        fontFamily:
+                          'Trebuchet MS, sans-serif',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Add to Council
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowAddSource(false)
+                      }
+                      style={{
+                        padding: '10px 20px',
+                        background: 'transparent',
+                        color: C.slate,
+                        border: `1px solid ${C.mint}`,
+                        borderRadius: 8,
+                        fontSize: 13,
+                        fontWeight: 600,
+                        fontFamily:
+                          'Trebuchet MS, sans-serif',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : null}
             </div>
 
             <div
