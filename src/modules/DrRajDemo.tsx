@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
-import { DrugSafetyCouncil } from './DrugSafetyCouncil';
-import { NurseCouncil } from './NurseCouncil';
+import DrugSafetyCouncil from './DrugSafetyCouncil';
+import NurseCouncil from './NurseCouncil';
 
 const C = {
   navy:   '#2D4459',
