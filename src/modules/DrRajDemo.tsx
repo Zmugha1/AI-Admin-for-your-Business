@@ -1,4 +1,6 @@
 import { useState, type ReactNode } from 'react';
+import { DrugSafetyCouncil } from './DrugSafetyCouncil';
+import { NurseCouncil } from './NurseCouncil';
 
 const C = {
   navy:   '#2D4459',
@@ -14,7 +16,12 @@ const C = {
   green:  '#3A7D5C',
 };
 
-type Job = 'invoice' | 'timesheet' | 'safety';
+type Job =
+  | 'invoice'
+  | 'timesheet'
+  | 'safety'
+  | 'drug_council'
+  | 'nurse_council';
 
 function Card({
   children,
@@ -167,7 +174,7 @@ function InvoiceJob() {
     setApproved(true);
     setAuditLine(
       `Action logged: Approved by ` +
-      `Dr. Raj Vuppalanchi — ${now}`
+      `Dr. Raj Vuppalanchi · ${now}`
     );
   }
 
@@ -175,7 +182,7 @@ function InvoiceJob() {
     setRejected(true);
     setAuditLine(
       `Action logged: Rejected by ` +
-      `Dr. Raj Vuppalanchi — ${now}`
+      `Dr. Raj Vuppalanchi · ${now}`
     );
   }
 
@@ -424,7 +431,7 @@ function TimesheetJob() {
     setApproved(true);
     setAuditLine(
       `Action logged: Approved by ` +
-      `Dr. Raj Vuppalanchi — ${now}`
+      `Dr. Raj Vuppalanchi · ${now}`
     );
   }
 
@@ -432,7 +439,7 @@ function TimesheetJob() {
     setRejected(true);
     setAuditLine(
       `Action logged: Rejected by ` +
-      `Dr. Raj Vuppalanchi — ${now}`
+      `Dr. Raj Vuppalanchi · ${now}`
     );
   }
 
@@ -458,8 +465,7 @@ function TimesheetJob() {
       <Card accent={C.teal}>
         <Label>Calendar Pull Complete</Label>
         <Source>
-          Source: IU Outlook Calendar —
-          April 2026
+          Source: IU Outlook Calendar · April 2026
         </Source>
         <div style={{ marginTop: 12 }}>
           <table style={{
@@ -709,7 +715,7 @@ function SafetyJob() {
     setApproved(true);
     setAuditLine(
       `Action logged: Saved to Research File ` +
-      `by Dr. Raj Vuppalanchi — ${now}`
+      `by Dr. Raj Vuppalanchi · ${now}`
     );
   }
 
@@ -717,7 +723,7 @@ function SafetyJob() {
     setRejected(true);
     setAuditLine(
       `Action logged: Discarded by ` +
-      `Dr. Raj Vuppalanchi — ${now}`
+      `Dr. Raj Vuppalanchi · ${now}`
     );
   }
 
@@ -1070,6 +1076,10 @@ export function DrRajDemo() {
       label: 'Directorship Timesheet' },
     { id: 'safety',
       label: 'Drug Safety Brief' },
+    { id: 'drug_council',
+      label: 'Drug Safety Council' },
+    { id: 'nurse_council',
+      label: 'Patient Education Council' },
   ];
 
   return (
@@ -1172,6 +1182,12 @@ export function DrRajDemo() {
           <TimesheetJob />}
         {activeJob === 'safety' &&
           <SafetyJob />}
+        {activeJob === 'drug_council' && (
+          <DrugSafetyCouncil />
+        )}
+        {activeJob === 'nurse_council' && (
+          <NurseCouncil />
+        )}
       </div>
     </div>
   );
