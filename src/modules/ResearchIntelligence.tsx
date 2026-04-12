@@ -3,6 +3,88 @@ import { openUrl } from '@tauri-apps/plugin-opener';
 import { getDb } from '../services/db';
 import { v4 as uuidv4 } from 'uuid';
 
+/**
+ * Opens http(s) URLs in the default browser.
+ * Same behavior as `import { open } from '@tauri-apps/plugin-shell'` for URLs; uses `plugin-opener` because `plugin-shell` is not in this app yet.
+ */
+async function openArticleUrl(url: string | null | undefined) {
+  if (!url) return;
+  await openUrl(url);
+}
+
+const RSS_SOURCES = [
+  {
+    id: 'mit_tech',
+    name: 'MIT Technology Review',
+    url: 'https://www.technologyreview.com/feed/',
+    category: 'AI Technology',
+    active: true,
+  },
+  {
+    id: 'venturebeat',
+    name: 'VentureBeat AI',
+    url: 'https://venturebeat.com/feed/',
+    category: 'AI Industry',
+    active: true,
+  },
+  {
+    id: 'elearning',
+    name: 'eLearning Industry',
+    url: 'https://elearningindustry.com/feed',
+    category: 'Learning and Development',
+    active: true,
+  },
+  {
+    id: 'inside_higher_ed',
+    name: 'Inside Higher Ed',
+    url: 'https://www.insidehighered.com/rss.xml',
+    category: 'Higher Education',
+    active: true,
+  },
+  {
+    id: 'edsurge',
+    name: 'EdSurge',
+    url: 'https://www.edsurge.com/news.rss',
+    category: 'Education Technology',
+    active: true,
+  },
+  {
+    id: 'towards_ds',
+    name: 'Towards Data Science',
+    url: 'https://towardsdatascience.com/feed',
+    category: 'Data Science',
+    active: true,
+  },
+  {
+    id: 'hbr',
+    name: 'Harvard Business Review',
+    url: 'https://hbr.org/rss/all',
+    category: 'Leadership',
+    active: true,
+  },
+  {
+    id: 'arxiv_ai',
+    name: 'Arxiv AI',
+    url: 'https://arxiv.org/rss/cs.AI',
+    category: 'AI Research',
+    active: true,
+  },
+  {
+    id: 'smallbiz',
+    name: 'SmallBizTrends',
+    url: 'https://smallbiztrends.com/feed',
+    category: 'Small Business',
+    active: true,
+  },
+  {
+    id: 'ai_business',
+    name: 'AI Business',
+    url: 'https://aibusiness.com/rss.xml',
+    category: 'AI for Business',
+    active: true,
+  },
+];
+
 const C = {
   navy: '#2D4459',
   teal: '#3BBFBF',
@@ -16,25 +98,15 @@ const C = {
   lgray: '#F4F7F8',
 };
 
-interface RssFeed {
-  feed_id: string;
-  name: string;
-  url: string;
-  category: string;
-  active: number;
-  last_fetched: string | null;
-}
-
+/** Aggregated RSS row for the News Feed tab (rss2json). */
 interface RssItem {
-  item_id: string;
-  feed_id: string;
-  feed_name: string;
-  feed_category: string;
+  id: string;
   title: string;
-  link: string | null;
-  summary: string | null;
-  published_date: string | null;
-  captured: number;
+  link: string;
+  description: string;
+  pubDate: string;
+  source: string;
+  category: string;
 }
 
 interface ResearchArticle {
@@ -63,96 +135,10 @@ interface SearchHit {
   source_type: 'pubmed' | 'eric' | 'semantic';
 }
 
-const CATEGORY_PILLS: { id: string; label: string }[] = [
-  { id: 'all', label: 'All' },
-  { id: 'ai', label: 'AI' },
-  { id: 'ld', label: 'L&D' },
-  { id: 'education', label: 'Education' },
-  { id: 'data', label: 'Data' },
-  { id: 'business', label: 'Business' },
-  { id: 'research', label: 'Research' },
-  { id: 'smallbiz', label: 'Small Biz' },
-];
-
-function categoryBorderColor(cat: string): string {
-  switch (cat) {
-    case 'ai':
-    case 'data':
-      return C.teal;
-    case 'ld':
-      return C.gold;
-    case 'education':
-      return C.navy;
-    case 'business':
-      return C.slate;
-    case 'research':
-      return C.coral;
-    case 'smallbiz':
-      return C.green;
-    default:
-      return C.mint;
-  }
-}
-
 function truncate(s: string | null, n: number): string {
   if (!s) return '';
   const t = s.trim();
   return t.length <= n ? t : `${t.slice(0, n)}…`;
-}
-
-function textEl(parent: Element | null, tag: string): string {
-  if (!parent) return '';
-  const el = parent.getElementsByTagName(tag)[0];
-  return el?.textContent?.trim() ?? '';
-}
-
-function parseRssItems(xmlText: string): {
-  title: string;
-  link: string | null;
-  summary: string | null;
-  pubDate: string | null;
-}[] {
-  const parser = new DOMParser();
-  const xml = parser.parseFromString(xmlText, 'text/xml');
-  const out: {
-    title: string;
-    link: string | null;
-    summary: string | null;
-    pubDate: string | null;
-  }[] = [];
-
-  const items = xml.querySelectorAll('item');
-  items.forEach(item => {
-    let link = textEl(item, 'link') || null;
-    if (!link) {
-      const guid = item.getElementsByTagName('guid')[0]?.textContent?.trim();
-      if (guid?.startsWith('http')) link = guid;
-    }
-    out.push({
-      title: textEl(item, 'title') || 'Untitled',
-      link,
-      summary:
-        textEl(item, 'description') ||
-        textEl(item, 'summary') ||
-        null,
-      pubDate: textEl(item, 'pubDate') || null,
-    });
-  });
-
-  if (out.length === 0) {
-    xml.querySelectorAll('entry').forEach(entry => {
-      const linkEl = entry.querySelector('link[href]');
-      const href = linkEl?.getAttribute('href') ?? null;
-      out.push({
-        title: textEl(entry, 'title') || 'Untitled',
-        link: href,
-        summary: textEl(entry, 'summary') || null,
-        pubDate: textEl(entry, 'updated') || null,
-      });
-    });
-  }
-
-  return out;
 }
 
 async function searchPubMed(query: string): Promise<SearchHit[]> {
@@ -321,14 +307,17 @@ export function ResearchIntelligence() {
   const [activeTab, setActiveTab] = useState<
     'news' | 'research' | 'reading'
   >('news');
-  const [feeds, setFeeds] = useState<RssFeed[]>([]);
   const [rssItems, setRssItems] = useState<RssItem[]>([]);
+  const [rssLoading, setRssLoading] = useState(false);
+  const [rssError, setRssError] = useState('');
+  const [selectedCategory, setSelectedCategory] =
+    useState('all');
+  const [lastRssFetch, setLastRssFetch] =
+    useState('');
   const [articles, setArticles] = useState<ResearchArticle[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchHit[]>([]);
   const [searching, setSearching] = useState(false);
-  const [fetching, setFetching] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('all');
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState('');
   const [usePubmed, setUsePubmed] = useState(true);
@@ -354,26 +343,6 @@ export function ResearchIntelligence() {
     setLoading(true);
     try {
       const db = await getDb();
-      const f = await db.select<RssFeed[]>(
-        `SELECT feed_id, name, url, category,
-                active, last_fetched
-         FROM rss_feeds
-         ORDER BY name ASC`
-      );
-      setFeeds(f);
-
-      const ri = await db.select<RssItem[]>(
-        `SELECT ri.item_id, ri.feed_id, rf.name AS feed_name,
-                rf.category AS feed_category,
-                ri.title, ri.link, ri.summary,
-                ri.published_date, ri.captured
-         FROM rss_items ri
-         JOIN rss_feeds rf ON ri.feed_id = rf.feed_id
-         ORDER BY ri.created_at DESC
-         LIMIT 50`
-      );
-      setRssItems(ri);
-
       const ar = await db.select<ResearchArticle[]>(
         `SELECT article_id, title, authors, source,
                 source_type, year, abstract, url, doi,
@@ -392,13 +361,6 @@ export function ResearchIntelligence() {
   useEffect(() => {
     load();
   }, [load]);
-
-  const filteredRss = useMemo(() => {
-    if (selectedCategory === 'all') return rssItems;
-    return rssItems.filter(
-      i => i.feed_category === selectedCategory
-    );
-  }, [rssItems, selectedCategory]);
 
   const filteredArticles = useMemo(() => {
     return articles.filter(a => {
@@ -422,110 +384,107 @@ export function ResearchIntelligence() {
     });
   }, [articles, readingStatusFilter, readingSourceFilter]);
 
-  async function linkExists(link: string | null): Promise<boolean> {
-    if (!link) return false;
-    const db = await getDb();
-    const r = await db.select<{ n: number }[]>(
-      `SELECT COUNT(*) as n FROM rss_items WHERE link = ?`,
-      [link]
-    );
-    return (r[0]?.n ?? 0) > 0;
-  }
+  async function fetchRssFeeds() {
+    setRssLoading(true);
+    setRssError('');
+    const items: RssItem[] = [];
 
-  async function fetchLatest() {
-    setFetching(true);
-    setSaveStatus('');
-    const db = await getDb();
-    const activeFeeds = feeds.filter(f => f.active === 1);
-    for (const feed of activeFeeds) {
+    for (const source of RSS_SOURCES.filter(
+      s => s.active
+    )) {
       try {
-        const res = await fetch(feed.url);
-        if (!res.ok) throw new Error(String(res.status));
-        const text = await res.text();
-        const parsed = parseRssItems(text);
-        for (const it of parsed) {
-          if (it.link && (await linkExists(it.link))) {
-            continue;
+        const proxyUrl =
+          `https://api.rss2json.com/v1/api.json` +
+          `?rss_url=${encodeURIComponent(source.url)}` +
+          `&api_key=public` +
+          `&count=5`;
+
+        const response = await fetch(proxyUrl);
+        const data = (await response.json()) as {
+          status?: string;
+          items?: {
+            guid?: string | { _: string };
+            link?: string;
+            title?: string;
+            description?: string;
+            pubDate?: string;
+          }[];
+        };
+
+        if (data.status === 'ok' && data.items) {
+          for (const item of data.items) {
+            const guidRaw = item.guid;
+            const guidStr =
+              typeof guidRaw === 'object' && guidRaw
+                ? String(
+                    (guidRaw as { _?: string })._ ?? ''
+                  )
+                : String(guidRaw ?? '');
+            const linkStr = String(item.link ?? '');
+            items.push({
+              id: `${source.id}_${guidStr || linkStr}`,
+              title: item.title || '',
+              link: linkStr,
+              description: item.description
+                ? item.description
+                    .replace(/<[^>]*>/g, '')
+                    .slice(0, 200)
+                : '',
+              pubDate: item.pubDate || '',
+              source: source.name,
+              category: source.category,
+            });
           }
-          const itemId = uuidv4();
-          await db.execute(
-            `INSERT OR IGNORE INTO rss_items
-               (item_id, feed_id, title, link, summary,
-                published_date)
-             VALUES (?, ?, ?, ?, ?, ?)`,
-            [
-              itemId,
-              feed.feed_id,
-              it.title,
-              it.link,
-              it.summary,
-              it.pubDate,
-            ]
-          );
         }
-        await db.execute(
-          `UPDATE rss_feeds SET last_fetched = datetime('now')
-           WHERE feed_id = ?`,
-          [feed.feed_id]
+      } catch {
+        console.error(
+          `RSS fetch failed: ${source.name}`
         );
-      } catch (err) {
-        console.error(`RSS fetch ${feed.name}:`, err);
       }
     }
-    setSaveStatus('Feed updated');
-    setTimeout(() => setSaveStatus(''), 4000);
-    await load();
-    setFetching(false);
+
+    items.sort((a, b) => {
+      const ta = new Date(a.pubDate).getTime();
+      const tb = new Date(b.pubDate).getTime();
+      const na = Number.isNaN(ta) ? 0 : ta;
+      const nb = Number.isNaN(tb) ? 0 : tb;
+      return nb - na;
+    });
+
+    setRssItems(items);
+    setLastRssFetch(new Date().toLocaleTimeString());
+    setRssLoading(false);
+    if (items.length === 0) {
+      setRssError(
+        'No articles returned. Check network or try again.'
+      );
+    } else {
+      setRssError('');
+    }
   }
 
-  async function captureRssToAha(item: RssItem) {
-    const db = await getDb();
-    const raw = item.summary ?? item.title;
-    await db.execute(
-      `INSERT INTO aha_moments
-         (aha_id, raw_input, input_type, key_insight,
-          stz_layer, source_title, content_worthy)
-       VALUES (?, ?, 'text', ?, 1, ?, 0)`,
-      [
-        uuidv4(),
-        raw,
-        item.title,
-        item.link ?? item.feed_name,
-      ]
-    );
-    await db.execute(
-      `UPDATE rss_items SET captured = 1 WHERE item_id = ?`,
-      [item.item_id]
-    );
-    await load();
-  }
-
-  async function saveRssToReading(item: RssItem) {
-    const db = await getDb();
-    await db.execute(
-      `INSERT INTO research_articles
-         (article_id, title, source, source_type, url,
-          abstract, status)
-       VALUES (?, ?, ?, 'rss', ?, ?, 'unread')`,
-      [
-        uuidv4(),
-        item.title,
-        item.feed_name,
-        item.link,
-        item.summary,
-      ]
-    );
-    setSaveStatus('Saved');
-    setTimeout(() => setSaveStatus(''), 3000);
-    await load();
-  }
-
-  async function openExternal(url: string | null) {
-    if (!url) return;
+  async function captureNewsToReading(item: RssItem) {
     try {
-      await openUrl(url);
-    } catch (e) {
-      console.error(e);
+      const db = await getDb();
+      await db.execute(
+        `INSERT INTO research_articles
+           (article_id, title, source, source_type, url,
+            abstract, status)
+         VALUES (?, ?, ?, 'rss', ?, ?, 'unread')`,
+        [
+          uuidv4(),
+          item.title,
+          item.source,
+          item.link || null,
+          item.description || null,
+        ]
+      );
+      setSaveStatus('Captured to Reading List');
+      setTimeout(() => setSaveStatus(''), 3000);
+      await load();
+    } catch (err) {
+      console.error('Capture failed:', err);
+      setRssError('Could not save to Reading List');
     }
   }
 
@@ -727,167 +686,289 @@ export function ResearchIntelligence() {
         <div>
           <div style={{
             display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'center',
             justifyContent: 'space-between',
-            gap: 12,
+            alignItems: 'center',
             marginBottom: 16,
           }}>
-            <div style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 6,
-            }}>
-              {CATEGORY_PILLS.map(p => {
-                const on = selectedCategory === p.id;
-                return (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => setSelectedCategory(p.id)}
-                    style={{
-                      padding: '4px 12px',
-                      borderRadius: 20,
-                      border: 'none',
-                      cursor: 'pointer',
-                      fontSize: 11,
-                      background: on ? C.teal : C.lgray,
-                      color: on ? C.white : C.slate,
-                      fontFamily: 'Trebuchet MS, sans-serif',
-                    }}
-                  >
-                    {p.label}
-                  </button>
-                );
-              })}
+            <div>
+              <div style={{
+                fontSize: 13,
+                color: C.slate,
+                fontFamily: 'Trebuchet MS, sans-serif',
+              }}>
+                {rssItems.length > 0
+                  ? `${rssItems.length} articles from ${RSS_SOURCES.length} sources`
+                  : 'Click Refresh to load latest news'}
+              </div>
+              {lastRssFetch ? (
+                <div style={{
+                  fontSize: 10,
+                  color: C.slate,
+                  fontFamily: 'Courier New, monospace',
+                  marginTop: 2,
+                }}>
+                  Last fetched: {lastRssFetch}
+                </div>
+              ) : null}
             </div>
             <button
               type="button"
-              disabled={fetching}
-              onClick={() => fetchLatest()}
+              onClick={() => void fetchRssFeeds()}
+              disabled={rssLoading}
               style={{
-                padding: '8px 18px',
-                background: fetching ? C.slate : C.teal,
-                color: C.white,
+                padding: '7px 18px',
+                background: rssLoading ? C.lgray : C.teal,
+                color: rssLoading ? C.slate : C.white,
                 border: 'none',
                 borderRadius: 8,
                 fontSize: 12,
                 fontWeight: 700,
-                cursor: fetching ? 'default' : 'pointer',
+                cursor: rssLoading ? 'default' : 'pointer',
+                fontFamily: 'Trebuchet MS, sans-serif',
               }}
             >
-              {fetching ? 'Fetching…' : 'Fetch Latest'}
+              {rssLoading ? 'Loading...' : 'Refresh'}
             </button>
           </div>
 
-          {filteredRss.length === 0 ? (
-            <p style={{
+          {rssItems.length > 0 ? (
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 6,
+              marginBottom: 16,
+            }}>
+              {[
+                'all',
+                ...Array.from(
+                  new Set(
+                    RSS_SOURCES.map(s => s.category)
+                  )
+                ),
+              ].map(cat => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setSelectedCategory(cat)}
+                  style={{
+                    padding: '4px 12px',
+                    borderRadius: 20,
+                    border: `1px solid ${
+                      selectedCategory === cat
+                        ? C.teal
+                        : C.mint}`,
+                    background:
+                      selectedCategory === cat
+                        ? C.teal
+                        : 'transparent',
+                    color:
+                      selectedCategory === cat
+                        ? C.white
+                        : C.slate,
+                    fontSize: 11,
+                    fontWeight:
+                      selectedCategory === cat ? 700 : 400,
+                    cursor: 'pointer',
+                    fontFamily: 'Courier New, monospace',
+                  }}
+                >
+                  {cat === 'all' ? 'All' : cat}
+                </button>
+              ))}
+            </div>
+          ) : null}
+
+          {rssError ? (
+            <div style={{
+              padding: '10px 14px',
+              background: '#F05F5712',
+              border: `1px solid ${C.coral}`,
+              borderRadius: 8,
+              fontSize: 12,
+              color: C.coral,
+              marginBottom: 12,
+              fontFamily: 'Courier New, monospace',
+            }}>
+              {rssError}
+            </div>
+          ) : null}
+
+          {!rssLoading && rssItems.length === 0 ? (
+            <div style={{
+              background: C.lgray,
+              borderRadius: 10,
+              padding: '32px 24px',
               textAlign: 'center',
+              fontSize: 13,
               color: C.slate,
               fontFamily: 'Trebuchet MS, sans-serif',
-              fontSize: 13,
             }}>
-              No news items yet. Click Fetch Latest to load your feeds.
-            </p>
-          ) : (
-            filteredRss.map(item => (
+              <div style={{
+                fontSize: 24,
+                marginBottom: 8,
+              }}>
+                📰
+              </div>
+              <div style={{
+                fontWeight: 600,
+                color: C.navy,
+                marginBottom: 4,
+              }}>
+                No articles loaded yet
+              </div>
+              <div>
+                Click Refresh to pull the latest from all
+                10 sources.
+              </div>
+            </div>
+          ) : null}
+
+          {rssItems
+            .filter(
+              item =>
+                selectedCategory === 'all' ||
+                item.category === selectedCategory
+            )
+            .map(item => (
               <div
-                key={item.item_id}
+                key={item.id}
                 style={{
                   background: C.white,
                   border: `1px solid ${C.mint}`,
-                  borderLeft: `4px solid ${categoryBorderColor(item.feed_category)}`,
+                  borderLeft: `4px solid ${C.teal}`,
                   borderRadius: 10,
-                  padding: '12px 16px',
-                  marginBottom: 8,
+                  padding: '14px 16px',
+                  marginBottom: 10,
                 }}
               >
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  marginBottom: 6,
+                }}>
+                  <div style={{
+                    fontFamily: 'Courier New, monospace',
+                    fontSize: 9,
+                    color: C.slate,
+                    background: C.lgray,
+                    padding: '2px 8px',
+                    borderRadius: 10,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
+                  }}>
+                    {item.source}
+                  </div>
+                  <div style={{
+                    fontFamily: 'Courier New, monospace',
+                    fontSize: 9,
+                    color: C.slate,
+                  }}>
+                    {item.pubDate
+                      ? new Date(
+                          item.pubDate
+                        ).toLocaleDateString()
+                      : ''}
+                  </div>
+                </div>
+
                 <div
                   role={item.link ? 'button' : undefined}
-                  onClick={() =>
-                    item.link && openExternal(item.link)}
+                  onClick={() => {
+                    if (item.link) {
+                      void openArticleUrl(item.link);
+                    }
+                  }}
+                  onKeyDown={e => {
+                    if (
+                      item.link &&
+                      (e.key === 'Enter' || e.key === ' ')
+                    ) {
+                      e.preventDefault();
+                      void openArticleUrl(item.link);
+                    }
+                  }}
+                  tabIndex={item.link ? 0 : undefined}
                   style={{
-                    fontFamily: 'Georgia, serif',
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: 700,
                     color: C.navy,
+                    fontFamily: 'Georgia, serif',
+                    lineHeight: 1.4,
+                    marginBottom: 6,
                     cursor: item.link ? 'pointer' : 'default',
+                    textDecoration: 'none',
+                  }}
+                  onMouseEnter={e => {
+                    if (item.link) {
+                      (e.currentTarget as HTMLElement)
+                        .style.color = C.teal;
+                      (e.currentTarget as HTMLElement)
+                        .style.textDecoration = 'underline';
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement)
+                      .style.color = C.navy;
+                    (e.currentTarget as HTMLElement)
+                      .style.textDecoration = 'none';
                   }}
                 >
                   {item.title}
                 </div>
-                <div style={{
-                  fontFamily: 'Courier New, monospace',
-                  fontSize: 10,
-                  color: C.slate,
-                  marginTop: 4,
-                }}>
-                  {item.feed_name}
-                  {item.published_date
-                    ? ` · ${item.published_date}`
-                    : ''}
-                </div>
-                <div style={{
-                  fontFamily: 'Trebuchet MS, sans-serif',
-                  fontSize: 12,
-                  color: C.slate,
-                  marginTop: 6,
-                  lineHeight: 1.4,
-                }}>
-                  {truncate(item.summary, 120)}
-                </div>
+
+                {item.description ? (
+                  <div style={{
+                    fontSize: 12,
+                    color: C.slate,
+                    fontFamily: 'Trebuchet MS, sans-serif',
+                    lineHeight: 1.5,
+                    marginBottom: 10,
+                  }}>
+                    {item.description}
+                    {item.description.length >= 200
+                      ? '...'
+                      : ''}
+                  </div>
+                ) : null}
+
                 <div style={{
                   display: 'flex',
-                  justifyContent: 'flex-end',
-                  gap: 8,
-                  marginTop: 10,
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
                 }}>
-                  {item.captured === 1 ? (
-                    <span style={{
-                      background: C.green,
-                      color: C.white,
-                      fontSize: 10,
-                      padding: '4px 10px',
-                      borderRadius: 6,
-                    }}>
-                      Captured
-                    </span>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => captureRssToAha(item)}
-                      style={{
-                        background: C.teal,
-                        color: C.white,
-                        fontSize: 10,
-                        padding: '4px 10px',
-                        border: 'none',
-                        borderRadius: 6,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Capture
-                    </button>
-                  )}
+                  <span style={{
+                    fontFamily: 'Courier New, monospace',
+                    fontSize: 9,
+                    color: C.teal,
+                    background: '#3BBFBF18',
+                    border: `1px solid ${C.teal}`,
+                    padding: '2px 8px',
+                    borderRadius: 10,
+                  }}>
+                    {item.category}
+                  </span>
                   <button
                     type="button"
-                    onClick={() => saveRssToReading(item)}
+                    onClick={() =>
+                      void captureNewsToReading(item)
+                    }
                     style={{
-                      background: C.lgray,
-                      color: C.slate,
-                      fontSize: 10,
-                      padding: '4px 10px',
+                      padding: '4px 12px',
+                      background: 'transparent',
                       border: `1px solid ${C.mint}`,
                       borderRadius: 6,
+                      fontSize: 10,
+                      color: C.slate,
                       cursor: 'pointer',
+                      fontFamily: 'Trebuchet MS, sans-serif',
                     }}
                   >
-                    Save to Reading List
+                    Capture
                   </button>
                 </div>
               </div>
-            ))
-          )}
+            ))}
         </div>
       )}
 
@@ -1014,7 +1095,21 @@ export function ResearchIntelligence() {
                   </span>
                   <div
                     role={hit.url ? 'button' : undefined}
-                    onClick={() => openExternal(hit.url)}
+                    onClick={() => {
+                      if (hit.url) {
+                        void openArticleUrl(hit.url);
+                      }
+                    }}
+                    onKeyDown={e => {
+                      if (
+                        hit.url &&
+                        (e.key === 'Enter' || e.key === ' ')
+                      ) {
+                        e.preventDefault();
+                        void openArticleUrl(hit.url);
+                      }
+                    }}
+                    tabIndex={hit.url ? 0 : undefined}
                     style={{
                       fontFamily: 'Georgia, serif',
                       fontSize: 13,
@@ -1022,6 +1117,19 @@ export function ResearchIntelligence() {
                       color: C.navy,
                       paddingRight: 80,
                       cursor: hit.url ? 'pointer' : 'default',
+                      textDecoration: 'none',
+                    }}
+                    onMouseEnter={e => {
+                      if (hit.url) {
+                        e.currentTarget.style.color = C.teal;
+                        e.currentTarget.style.textDecoration =
+                          'underline';
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.color = C.navy;
+                      e.currentTarget.style.textDecoration =
+                        'none';
                     }}
                   >
                     {hit.title}
@@ -1208,13 +1316,40 @@ export function ResearchIntelligence() {
                 >
                   <div
                     role={a.url ? 'button' : undefined}
-                    onClick={() => openExternal(a.url)}
+                    onClick={() => {
+                      if (a.url) {
+                        void openArticleUrl(a.url);
+                      }
+                    }}
+                    onKeyDown={e => {
+                      if (
+                        a.url &&
+                        (e.key === 'Enter' || e.key === ' ')
+                      ) {
+                        e.preventDefault();
+                        void openArticleUrl(a.url);
+                      }
+                    }}
+                    tabIndex={a.url ? 0 : undefined}
                     style={{
                       fontFamily: 'Georgia, serif',
                       fontSize: 13,
                       fontWeight: 700,
                       color: C.navy,
                       cursor: a.url ? 'pointer' : 'default',
+                      textDecoration: 'none',
+                    }}
+                    onMouseEnter={e => {
+                      if (a.url) {
+                        e.currentTarget.style.color = C.teal;
+                        e.currentTarget.style.textDecoration =
+                          'underline';
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.color = C.navy;
+                      e.currentTarget.style.textDecoration =
+                        'none';
                     }}
                   >
                     {a.title}
