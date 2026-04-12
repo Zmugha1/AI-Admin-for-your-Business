@@ -2,12 +2,16 @@ mod ollama;
 mod google_auth;
 mod gmail_sync;
 mod calendar_sync;
+mod domain_library;
 
 use calendar_sync::calendar_sync;
 use gmail_sync::gmail_sync;
 use google_auth::{
     google_auth_exchange, google_auth_listen, google_auth_start,
     google_refresh_token, google_revoke_token,
+};
+use domain_library::{
+    chunk_text, cosine_similarity, embed_chunk, read_text_file,
 };
 use ollama::{ollama_embed, ollama_generate, ollama_health_check};
 use std::process::Command;
@@ -51,6 +55,10 @@ pub fn run() {
             ollama_generate,
             ollama_health_check,
             ollama_embed,
+            chunk_text,
+            embed_chunk,
+            cosine_similarity,
+            read_text_file,
             google_auth_start,
             google_auth_listen,
             google_auth_exchange,

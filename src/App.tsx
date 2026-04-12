@@ -14,6 +14,7 @@ import { BusinessGoals } from './modules/BusinessGoals';
 import { MyFinances } from './modules/MyFinances';
 import { GoogleIntegration } from './modules/GoogleIntegration';
 import { ResearchIntelligence } from './modules/ResearchIntelligence';
+import { DomainLibrary } from './modules/DomainLibrary';
 import { PreMeetingBrief } from './modules/PreMeetingBrief';
 import { ContentQueue } from './modules/ContentQueue';
 import { AuditLog } from './modules/AuditLog';
@@ -33,6 +34,7 @@ type Page =
   | 'finances'
   | 'google'
   | 'research'
+  | 'domain'
   | 'pre_meeting'
   | 'vault'
   | 'audit'
@@ -52,6 +54,7 @@ const NAV: { id: Page; label: string }[] = [
   { id: 'finances', label: 'My Finances'     },
   { id: 'google',   label: 'Google Integration' },
   { id: 'research', label: 'Research Intelligence' },
+  { id: 'domain', label: 'Domain Library' },
   { id: 'pre_meeting', label: 'Meeting Prep' },
   { id: 'vault',    label: 'The Vault'       },
   { id: 'audit',    label: 'Audit Log'       },
@@ -341,6 +344,7 @@ export default function App() {
         {page === 'finances' && <MyFinances />}
         {page === 'google'   && <GoogleIntegration />}
         {page === 'research' && <ResearchIntelligence />}
+        {page === 'domain' && <DomainLibrary />}
         {page === 'pre_meeting' && <PreMeetingBrief />}
         {page === 'vault'    && <Placeholder title="The Vault" />}
         {page === 'audit'    && <AuditLog />}

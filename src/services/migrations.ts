@@ -1448,4 +1448,61 @@ STRUCTURE — follow exactly:
     version = 2
     WHERE prompt_id = 'p_bni_pitch_v1';`,
   },
+
+  {
+    version: 37,
+    name: 'domain_documents',
+    sql: `CREATE TABLE IF NOT EXISTS
+      domain_documents (
+        doc_id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        doc_type TEXT NOT NULL,
+        file_path TEXT,
+        file_name TEXT,
+        raw_text TEXT,
+        word_count INTEGER DEFAULT 0,
+        chunk_count INTEGER DEFAULT 0,
+        embedded INTEGER DEFAULT 0,
+        embedded_at TEXT,
+        stz_layer TEXT,
+        tags TEXT,
+        notes TEXT,
+        created_at TEXT
+          DEFAULT (datetime('now')),
+        updated_at TEXT
+          DEFAULT (datetime('now'))
+      );
+    CREATE INDEX IF NOT EXISTS
+      idx_domain_docs_type
+      ON domain_documents(doc_type);
+    CREATE INDEX IF NOT EXISTS
+      idx_domain_docs_embedded
+      ON domain_documents(embedded);`,
+  },
+
+  {
+    version: 38,
+    name: 'domain_embeddings',
+    sql: `CREATE TABLE IF NOT EXISTS
+      domain_embeddings (
+        embedding_id TEXT PRIMARY KEY,
+        doc_id TEXT NOT NULL,
+        chunk_index INTEGER NOT NULL,
+        chunk_text TEXT NOT NULL,
+        chunk_tokens INTEGER DEFAULT 0,
+        embedding_json TEXT,
+        created_at TEXT
+          DEFAULT (datetime('now')),
+        FOREIGN KEY (doc_id)
+          REFERENCES domain_documents(doc_id)
+      );
+    CREATE INDEX IF NOT EXISTS
+      idx_embeddings_doc
+      ON domain_embeddings(doc_id);
+    CREATE INDEX IF NOT EXISTS
+      idx_embeddings_chunk
+      ON domain_embeddings(
+        doc_id, chunk_index
+      );`,
+  },
 ];
