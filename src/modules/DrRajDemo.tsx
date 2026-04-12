@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react';
+import { DrRajMorningBrief } from './DrRajMorningBrief';
 import DrugSafetyCouncil from './DrugSafetyCouncil';
 import NurseCouncil from './NurseCouncil';
 
@@ -17,6 +18,7 @@ const C = {
 };
 
 type Job =
+  | 'morning'
   | 'invoice'
   | 'timesheet'
   | 'safety'
@@ -1067,9 +1069,10 @@ function SafetyJob() {
 
 export function DrRajDemo() {
   const [activeJob, setActiveJob] =
-    useState<Job>('invoice');
+    useState<Job>('morning');
 
   const jobs: { id: Job; label: string }[] = [
+    { id: 'morning', label: 'Morning Brief' },
     { id: 'invoice',
       label: 'Invoice Generator' },
     { id: 'timesheet',
@@ -1173,9 +1176,17 @@ export function DrRajDemo() {
       {/* Right panel */}
       <div style={{
         flex: 1, overflowY: 'auto',
-        padding: '32px 36px',
+        padding:
+          activeJob === 'morning' ? 0 : '32px 36px',
         background: C.cream,
       }}>
+        {activeJob === 'morning' && (
+          <DrRajMorningBrief
+            onOpenCouncil={() =>
+              setActiveJob('drug_council')
+            }
+          />
+        )}
         {activeJob === 'invoice' &&
           <InvoiceJob />}
         {activeJob === 'timesheet' &&
