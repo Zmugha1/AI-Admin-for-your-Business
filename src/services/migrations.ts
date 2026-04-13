@@ -1509,7 +1509,8 @@ STRUCTURE — follow exactly:
   {
     version: 39,
     name: 'domain_library_jobs',
-    sql: `INSERT OR IGNORE INTO prompts
+    sql: `-- Each prompts.job_id must match jobs_menu.job_id in this migration.
+INSERT OR IGNORE INTO prompts
       (prompt_id, job_id, version,
        system_template, user_template)
     VALUES
