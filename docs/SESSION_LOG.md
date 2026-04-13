@@ -93,3 +93,62 @@ Blockers or open items:
   Morning Brief revenue panel will show
     zero until MRR values are entered
 
+## Session 2026-04-13
+
+Commits this session:
+  aac5b96 -- RSS news feed fix
+  a373a75 -- Domain Library migrations
+             37-38, Rust chunker, embedder
+  467984f -- TECH_STACK.md added
+  267c04a -- Migration 39 -- 10 domain
+             library jobs seeded
+  d48c21f -- Fix prompt job_id alignment
+  fa58927 -- Dr Raj Morning Brief page
+  14c0905 -- Source visibility councils
+  7546951 -- Dr Raj council pages
+  edbc994 -- Multi-agent council update
+  b509b9e -- START AI button
+  cb4240a -- DrRajDemo full brand styling
+  5ad79a4 -- Wire DrRajDemo sidebar
+  0f1e387 -- Migrations 22-29 pipeline
+             client cards financials
+  [Dr Raj sources commit pending]
+
+ADRs added: 4
+  Domain Library nomic embeddings
+  Dr Raj separate repo decision
+  GLM-5.1 cloud dev only
+  Migration versioning discipline
+
+Incidents resolved: 3
+  Migration UNIQUE constraint pattern
+  proposal_gen orphaned job_id
+  invoke() camelCase parameter error
+
+Runbooks added: 4
+  Fix migration UNIQUE constraint
+  Add document to Domain Library
+  Kill stuck Tauri session
+  Connect Google OAuth
+
+Voice rules added: 3
+  No em dashes
+  Human test before output leaves
+  Lead with pain not feature
+
+Next session should start with:
+  Run Dr Raj sources commit hash
+  Test Proposal and Pricing Generator
+  Build Dr-Raj_Intel repo from scratch
+  Priority: Dr Raj demo ready for Monday
+
+Blockers or open items:
+  Dr Raj sources commit pending hash
+  Dr-Raj_Intel repo needs scaffold
+  plugin-shell not installed -- using
+    plugin-opener workaround
+  Morning Brief live panels not yet
+    wired to real data
+  Client card tabs 2-5 content sparse
+  System Health Dashboard not built
+

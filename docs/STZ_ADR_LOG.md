@@ -262,3 +262,51 @@ Consequence: Research RSS and public APIs may
 Never do: Use fetch() to localhost:11434 from
   the frontend
 
+## ADR-019
+Date: 2026-04-13
+Decision: Domain Library built on
+  nomic-embed-text via Ollama
+Layer: Tech
+Context: Need RAG context for jobs
+Consequence: Every job can draw from
+  uploaded documents as context
+Never do: Use cloud embeddings for
+  client documents
+
+## ADR-020
+Date: 2026-04-13
+Decision: Dr. Raj system to be built
+  as separate repo Dr-Raj_Intel
+Layer: Tech
+Context: Client needs production system
+  not demo module inside Zubia Pulse
+Consequence: Clone DrData_Pulse_Platform
+  build dedicated Vault tier app
+Never do: Deploy client system inside
+  Zubia Pulse Desktop
+
+## ADR-021
+Date: 2026-04-13
+Decision: GLM-5.1 cloud approved for
+  Zubia dev work only
+Layer: Tech
+Context: Strong agentic coding model
+  but runs on Ollama cloud servers
+Consequence: Use for building prompts
+  and debugging code only
+Never do: Use any :cloud model in
+  any client deployment
+
+## ADR-022
+Date: 2026-04-13
+Decision: Migrations 37-38 domain library
+  confirmed applied cleanly
+Layer: Tech
+Context: Previous attempts at 30-31
+  conflicted with existing versions
+Consequence: Always check
+  schema_migrations before assigning
+  any new version number
+Never do: Assume version numbers are
+  available without checking database
+

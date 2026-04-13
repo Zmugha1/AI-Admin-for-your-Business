@@ -115,3 +115,34 @@ Example bad: Therapist plus realtor plus
   Jeff all stacked in one 60-second pitch.
 STZ source: L1 Q5 — quality criteria
 
+## VOICE-011
+Rule: No em dashes ever in any output
+Example good: The system processes
+  your request, validates it, and
+  returns a result.
+Example bad: The system processes your
+  request -- validates it -- and
+  returns a result.
+STZ source: L1 Q2 -- terminology rules
+
+## VOICE-012
+Rule: Every output must pass the
+  human test before leaving the system
+Example good: reads like Dr. Zubia
+  wrote it after reviewing the client
+  situation personally
+Example bad: reads like a template
+  with the client name inserted
+STZ source: L1 Q5 -- quality criteria
+
+## VOICE-013
+Rule: Lead with the client pain point
+  not the feature
+Example good: You are spending 3 hours
+  per month on timesheets you cannot
+  track. This system recovers that time.
+Example bad: This system has a calendar
+  integration that pulls your meetings
+  automatically.
+STZ source: L2 Q10 -- scoring system
+

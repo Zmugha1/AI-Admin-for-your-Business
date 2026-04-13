@@ -187,3 +187,45 @@ Prevention rule: Keep pipeline list visible
   while editing a single contact
 Commit: bdc189b
 
+## INC-013
+Date: 2026-04-13
+What broke: Init error UNIQUE constraint
+  on schema_migrations repeatedly
+Root cause: Migration version numbers
+  in code did not match what was
+  already applied in database
+Fix applied: Query schema_migrations
+  first, delete duplicate rows via
+  sqlite3, renumber migrations
+Prevention rule: Always run sqlite3
+  SELECT version FROM schema_migrations
+  before assigning any new version
+Commit: session 2026-04-13
+
+## INC-014
+Date: 2026-04-13
+What broke: proposal_gen job failed
+  with no active prompt error
+Root cause: Old job_id proposal_gen
+  had no matching prompt in prompts table
+Fix applied: Deactivated old job via
+  sqlite3 UPDATE jobs_menu SET active=0
+Prevention rule: Always check both
+  jobs_menu and prompts table for
+  orphaned job_ids before adding new jobs
+Commit: session 2026-04-13
+
+## INC-015
+Date: 2026-04-13
+What broke: invoke() parameter mismatch
+  in Google sync -- accessToken vs
+  access_token
+Root cause: Tauri 2 requires camelCase
+  in TypeScript invoke() calls
+Fix applied: Updated all invoke params
+  to camelCase in googleService.ts
+Prevention rule: Always use camelCase
+  in invoke() -- Tauri converts to
+  snake_case for Rust automatically
+Commit: session 2026-04-13
+

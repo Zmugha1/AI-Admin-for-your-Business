@@ -170,3 +170,80 @@ Watch out for: Pending forever means the
   10 minutes means timeout logic missing or
   Ollama stuck; check ollama serve and logs
 
+## RUN-009
+Task: Fix migration UNIQUE constraint error
+Trigger: App shows Init error code 1555
+Steps:
+  1. Run sqlite3 SELECT version, name
+     FROM schema_migrations ORDER BY version
+  2. Compare to ALL_MIGRATIONS in
+     migrations.ts
+  3. Find the conflicting version number
+  4. Run sqlite3 DELETE FROM
+     schema_migrations WHERE version = X
+     for each duplicate
+  5. Restart app
+Expected output: App loads without error
+Watch out for: Multiple duplicates --
+  check entire table not just one row
+
+## RUN-010
+Task: Add document to Domain Library
+  and embed with nomic-embed-text
+Trigger: New document needs to be
+  searchable by RAG system
+Steps:
+  1. Open Domain Library in Zubia Pulse
+  2. Click Add Document tab
+  3. Fill title, type, STZ layer, tags
+  4. Paste full document text
+  5. Click Save and Embed
+  6. Watch progress bar -- do not close
+  7. Verify green border and chunk count
+  8. Test with Semantic Search
+Expected output: Document appears in
+  My Library with green border and
+  chunk count greater than zero
+Watch out for: Ollama must be running
+  before embedding -- START AI first
+
+## RUN-011
+Task: Kill stuck Tauri session and
+  restart cleanly
+Trigger: Port 1420 already in use error
+  or app will not start
+Steps:
+  1. taskkill /F /IM "zubia-pulse.exe"
+  2. taskkill /F /IM "Zubia_Pulse_Desktop.exe"
+  3. Find port 1420 process:
+     netstat -ano | findstr ":1420"
+  4. taskkill /F /PID [pid from step 3]
+  5. npm run tauri dev
+Expected output: App starts cleanly
+Watch out for: Multiple node processes --
+  may need to kill more than one
+
+## RUN-012
+Task: Connect Google Gmail and Calendar
+Trigger: New client or fresh install
+Steps:
+  1. Create Web application OAuth client
+     in Google Cloud Console
+  2. Add redirect URI:
+     http://localhost:8765/callback
+  3. Add test user email
+  4. Download JSON to project root as
+     google_credentials.json
+  5. Start app -- go to Google Integration
+  6. Click Connect Google
+  7. Browser opens -- sign in
+  8. App captures code automatically
+  9. Click Sync Now
+Expected output: Gmail Connected,
+  Calendar Connected, emails and
+  events synced
+Watch out for: Must be Web application
+  type not Desktop app type --
+  Desktop clients do not support
+  custom redirect URIs
+
